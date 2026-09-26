@@ -204,12 +204,12 @@ func TestMatchReviewEditResultRoundTripsGameFields(t *testing.T) {
 	assert.True(t, savedResult.RedScore.Toss)
 	assert.Equal(t, 1, len(savedResult.RedScore.Fouls))
 
-	// The recomputed summary should reflect the new fields, including the crown bonus (CrownTeleopTop = +10).
+	// The recomputed summary should reflect the new fields, including the crown (CrownTeleopTop = 20).
 	summary := savedResult.RedScoreSummary()
 	assert.Equal(t, 4+4, summary.LeavePoints) // Two robots left (stations 1 and 3).
 	assert.Equal(t, 4*1+8*2+12*3, summary.AutoTreasurePoints)
-	assert.Equal(t, 10, summary.CrownBonusPoints)
-	assert.Equal(t, 2*4+5*5+10*6+8*7+10, summary.TeleopTreasurePoints)
+	assert.Equal(t, 20, summary.CrownPoints)
+	assert.Equal(t, 2*4+5*5+10*6+8*7+20, summary.TeleopTreasurePoints)
 	assert.Equal(t, 2+12, summary.EndgamePoints) // Station 2 parked (2), station 3 balanced (12).
 }
 

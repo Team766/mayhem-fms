@@ -37,7 +37,7 @@ const crownValueByCounter = {
   teleop_stacked: 7,
 };
 
-// The currently-known crown placement, used to decide whether tapping a Crown button sets or clears it.
+// The currently-known crown placement, used to decide whether tapping a crown button sets or clears it.
 let currentCrown = 0;
 
 // Handles a websocket message to update the teams for the current match.

@@ -14,18 +14,31 @@ UI for entering realtime scores.
   {{$teamCount := 3}}{{if .TwoVsTwoMode}}{{$teamCount = 2}}{{end}}
   {{if .Position.ShowsNear}}
   <section id="nearControls">
-    <h2>Auto</h2>
+    <h2>Auto treasure</h2>
     <div class="counter-group">
-      {{template "counterRow" dict "id" "auto_floor" "label" "Auto Floor"}}
-      {{template "counterRow" dict "id" "auto_first" "label" "Auto First"}}
-      {{template "counterRow" dict "id" "auto_top" "label" "Auto Top"}}
+      {{template "counterRow" dict "id" "auto_floor" "label" "Floor"}}
+      {{template "counterRow" dict "id" "auto_first" "label" "First Shelf"}}
+      {{template "counterRow" dict "id" "auto_top" "label" "Top Shelf"}}
     </div>
-    <h2>Teleop + Endgame</h2>
+    <h2>Auto crown</h2>
+    <div class="crown-group">
+      {{template "crownButton" dict "id" "auto_floor" "label" "Floor"}}
+      {{template "crownButton" dict "id" "auto_first" "label" "First Shelf"}}
+      {{template "crownButton" dict "id" "auto_top" "label" "Top Shelf"}}
+    </div>
+    <h2>Teleop treasure</h2>
     <div class="counter-group">
       {{template "counterRow" dict "id" "teleop_floor" "label" "Floor"}}
-      {{template "counterRow" dict "id" "teleop_first" "label" "First"}}
-      {{template "counterRow" dict "id" "teleop_top" "label" "Top"}}
+      {{template "counterRow" dict "id" "teleop_first" "label" "First Shelf"}}
+      {{template "counterRow" dict "id" "teleop_top" "label" "Top Shelf"}}
       {{template "counterRow" dict "id" "teleop_stacked" "label" "Stacked"}}
+    </div>
+    <h2>Teleop crown</h2>
+    <div class="crown-group">
+      {{template "crownButton" dict "id" "teleop_floor" "label" "Floor"}}
+      {{template "crownButton" dict "id" "teleop_first" "label" "First Shelf"}}
+      {{template "crownButton" dict "id" "teleop_top" "label" "Top Shelf"}}
+      {{template "crownButton" dict "id" "teleop_stacked" "label" "Stacked"}}
     </div>
   </section>
   {{end}}
@@ -87,6 +100,9 @@ UI for entering realtime scores.
   <button class="counter-button scoring-button" ontouchstart disabled onclick="adjustCounter('{{.id}}', -1);">&minus;</button>
   <div class="counter-value" id="value-{{.id}}">0</div>
   <button class="counter-button scoring-button" ontouchstart disabled onclick="adjustCounter('{{.id}}', 1);">+</button>
-  <button id="crown-{{.id}}" class="crown-button scoring-button" ontouchstart disabled onclick="toggleCrown('{{.id}}');">Crown</button>
 </div>
+{{end}}
+
+{{define "crownButton"}}
+<button id="crown-{{.id}}" class="crown-button scoring-button" ontouchstart disabled onclick="toggleCrown('{{.id}}');">{{.label}}</button>
 {{end}}

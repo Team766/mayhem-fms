@@ -89,41 +89,43 @@ func TestScoreTreasureCount(t *testing.T) {
 	}
 	summary := score.Summarize(&Score{})
 
-	// Every counter counts once; the crown is already one of the counted treasures and the toss cube is not a treasure.
-	assert.Equal(t, 1+2+3+4+5+6+7, summary.TreasureCount)
-	assert.Equal(t, 5+6+7, summary.ShelfTreasureCount)
+	// Every counter counts once and the crown counts as one more treasure; the toss cube is not a treasure.
+	assert.Equal(t, 1+2+3+4+5+6+7+1, summary.TreasureCount)
+	assert.Equal(t, 5+6+7+1, summary.ShelfTreasureCount)
 }
 
-func TestScoreCrownBonus(t *testing.T) {
+func TestScoreCrownPoints(t *testing.T) {
 	testCases := []struct {
 		name                         string
 		crown                        CrownPlacement
-		expectedCrownBonusPoints     int
+		expectedCrownPoints          int
 		expectedAutoTreasurePoints   int
 		expectedTeleopTreasurePoints int
+		expectedTreasureCount        int
+		expectedShelfTreasureCount   int
 	}{
-		{"no crown", CrownNone, 0, 0, 0},
-		{"auto floor", CrownAutoFloor, 4, 4, 0},
-		{"auto first", CrownAutoFirst, 8, 8, 0},
-		{"auto top", CrownAutoTop, 12, 12, 0},
-		{"teleop floor", CrownTeleopFloor, 2, 0, 2},
-		{"teleop first", CrownTeleopFirst, 5, 0, 5},
-		{"teleop top", CrownTeleopTop, 10, 0, 10},
-		{"teleop stacked", CrownTeleopStacked, 8, 0, 8},
+		{"no crown", CrownNone, 0, 0, 0, 0, 0},
+		{"auto floor", CrownAutoFloor, 8, 8, 0, 1, 0},
+		{"auto first", CrownAutoFirst, 16, 16, 0, 1, 0},
+		{"auto top", CrownAutoTop, 24, 24, 0, 1, 0},
+		{"teleop floor", CrownTeleopFloor, 4, 0, 4, 1, 0},
+		{"teleop first", CrownTeleopFirst, 10, 0, 10, 1, 1},
+		{"teleop top", CrownTeleopTop, 20, 0, 20, 1, 1},
+		{"teleop stacked", CrownTeleopStacked, 16, 0, 16, 1, 1},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(
 			testCase.name, func(t *testing.T) {
-				// The bonus is added whenever the crown is set, even if the matching counter is zero.
+				// The treasure counters never include the crown, so it scores on its own.
 				score := Score{Crown: testCase.crown}
 				summary := score.Summarize(&Score{})
-				assert.Equal(t, testCase.expectedCrownBonusPoints, summary.CrownBonusPoints)
+				assert.Equal(t, testCase.expectedCrownPoints, summary.CrownPoints)
 				assert.Equal(t, testCase.crown, summary.Crown)
 				assert.Equal(t, testCase.expectedAutoTreasurePoints, summary.AutoTreasurePoints)
 				assert.Equal(t, testCase.expectedTeleopTreasurePoints, summary.TeleopTreasurePoints)
 
-				// The bonus is counted once, inside the period's treasure points, and never again in the match points.
+				// The crown's points are counted once, inside the period's treasure points.
 				assert.Equal(t, testCase.expectedAutoTreasurePoints, summary.AutonPoints)
 				assert.Equal(
 					t,
@@ -131,34 +133,34 @@ func TestScoreCrownBonus(t *testing.T) {
 					summary.MatchPoints,
 				)
 
-				// The crown selector never changes any treasure count.
-				assert.Equal(t, 0, summary.TreasureCount)
-				assert.Equal(t, 0, summary.ShelfTreasureCount)
+				// The crown is one treasure, and one toward the Scoring ranking point when it is on a shelf or stacked in
+				// teleop.
+				assert.Equal(t, testCase.expectedTreasureCount, summary.TreasureCount)
+				assert.Equal(t, testCase.expectedShelfTreasureCount, summary.ShelfTreasureCount)
 			},
 		)
 	}
 }
 
 func TestScoreCrownDoublesItsOwnPlacementOnly(t *testing.T) {
-	// A crown on the top shelf in teleop scores 10 (counter) + 10 (bonus) = 20; other treasures are unaffected.
+	// Three treasures and the crown on the top shelf in teleop: 3 x 10 + 20 = 50; the other treasures are unaffected.
 	score := Score{TeleopTop: 3, Crown: CrownTeleopTop}
 	summary := score.Summarize(&Score{})
-	assert.Equal(t, 30+10, summary.TeleopTreasurePoints)
-	assert.Equal(t, 3, summary.ShelfTreasureCount)
+	assert.Equal(t, 30+20, summary.TeleopTreasurePoints)
+	assert.Equal(t, 4, summary.ShelfTreasureCount)
 
-	// On the first shelf in auto: 8 + 8 = 16.
-	score = Score{AutoFirst: 1, Crown: CrownAutoFirst}
+	// The crown alone on the first shelf in auto: 16.
+	score = Score{Crown: CrownAutoFirst}
 	summary = score.Summarize(&Score{})
 	assert.Equal(t, 16, summary.AutoTreasurePoints)
 
-	// Stacked in teleop: 8 + 8 = 16.
-	score = Score{TeleopStacked: 1, Crown: CrownTeleopStacked}
+	// The crown alone, stacked in teleop: 16.
+	score = Score{Crown: CrownTeleopStacked}
 	summary = score.Summarize(&Score{})
 	assert.Equal(t, 16, summary.TeleopTreasurePoints)
 
 	// Nothing else is doubled: not the robot points, not the toss, not the foul points.
 	score = Score{
-		TeleopTop:       1,
 		Crown:           CrownTeleopTop,
 		LeaveStatuses:   [3]bool{true, true, false},
 		EndgameStatuses: [3]EndgameStatus{EndgameBalance, EndgameNone, EndgameNone},
@@ -371,7 +373,7 @@ func TestScoreAutonRankingPoint(t *testing.T) {
 		{"above the threshold", Score{AutoTop: 2}, Score{}, 24, true, false},
 		{"nothing in auto", Score{}, Score{}, 0, false, false},
 		// The crown bonus counts toward the auton points when the crown was placed in auto.
-		{"reaching the threshold with the crown", Score{AutoFirst: 2, Crown: CrownAutoFirst}, Score{}, 24, true, false},
+		{"reaching the threshold with the crown", Score{AutoFirst: 1, Crown: CrownAutoFirst}, Score{}, 24, true, false},
 		{"a teleop crown does not count", Score{AutoFirst: 2, Crown: CrownTeleopTop}, Score{}, 16, false, false},
 		// Teleop scoring and foul points never count toward the Auton RP.
 		{"a huge teleop", Score{TeleopTop: 10}, Score{}, 0, false, false},
@@ -454,8 +456,10 @@ func TestScoreScoringRankingPoint(t *testing.T) {
 		{"floor treasures do not count", Score{TeleopFloor: 20, TeleopFirst: 11}, 11, false},
 		{"auto placements do not count", Score{AutoFloor: 5, AutoFirst: 5, AutoTop: 5, TeleopFirst: 11}, 11, false},
 		// The crown is one treasure, counted once by the counter it was entered in.
-		{"the crown counts once", Score{TeleopTop: 11, Crown: CrownTeleopTop}, 11, false},
-		{"the crown counts once, at the threshold", Score{TeleopTop: 12, Crown: CrownTeleopTop}, 12, true},
+		{"the crown counts as one treasure", Score{TeleopTop: 10, Crown: CrownTeleopTop}, 11, false},
+		{"the crown counts as one treasure, at the threshold", Score{TeleopTop: 11, Crown: CrownTeleopTop}, 12, true},
+		{"a floor crown does not count", Score{TeleopTop: 11, Crown: CrownTeleopFloor}, 11, false},
+		{"an auto crown does not count", Score{TeleopTop: 11, Crown: CrownAutoTop}, 11, false},
 		// The toss cube is not a shelf treasure.
 		{"the toss does not count", Score{TeleopTop: 11, Toss: true}, 11, false},
 	}
@@ -662,7 +666,7 @@ func TestScoreSummary(t *testing.T) {
 	assert.Equal(t, 14, redSummary.EndgamePoints)
 	assert.Equal(t, 2, redSummary.TossPoints)
 	assert.Equal(t, CrownTeleopTop, redSummary.Crown)
-	assert.Equal(t, 10, redSummary.CrownBonusPoints)
+	assert.Equal(t, 20, redSummary.CrownPoints)
 	assert.Equal(t, 14, redSummary.TreasureCount)
 	assert.Equal(t, 7, redSummary.ShelfTreasureCount)
 	assert.Equal(t, 132, redSummary.MatchPoints)
@@ -687,7 +691,7 @@ func TestScoreSummary(t *testing.T) {
 	assert.Equal(t, 2, blueSummary.EndgamePoints)
 	assert.Equal(t, 0, blueSummary.TossPoints)
 	assert.Equal(t, CrownNone, blueSummary.Crown)
-	assert.Equal(t, 0, blueSummary.CrownBonusPoints)
+	assert.Equal(t, 0, blueSummary.CrownPoints)
 	assert.Equal(t, 7, blueSummary.TreasureCount)
 	assert.Equal(t, 4, blueSummary.ShelfTreasureCount)
 	assert.Equal(t, 43, blueSummary.MatchPoints)

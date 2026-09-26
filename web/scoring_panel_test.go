@@ -29,11 +29,13 @@ func TestScoringPanel(t *testing.T) {
 
 		parameters := positionParameters[position]
 		if parameters.ShowsNear() {
-			assert.Contains(t, body, "Auto Floor")
+			assert.Contains(t, body, "Auto treasure")
 			assert.Contains(t, body, "Stacked")
-			assert.Contains(t, body, "crown-teleop_top")
+			assert.Contains(t, body, "Teleop crown")
+			assert.Contains(t, body, "crown-auto_top")
+			assert.Contains(t, body, "crown-teleop_stacked")
 		} else {
-			assert.NotContains(t, body, "Auto Floor")
+			assert.NotContains(t, body, "Auto treasure")
 		}
 		if parameters.ShowsFar() {
 			assert.Contains(t, body, "The Toss")

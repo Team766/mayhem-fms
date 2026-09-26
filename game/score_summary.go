@@ -14,7 +14,7 @@ type ScoreSummary struct {
 	EndgamePoints             int
 	TossPoints                int
 	Crown                     CrownPlacement
-	CrownBonusPoints          int
+	CrownPoints               int
 	TreasureCount             int
 	ShelfTreasureCount        int
 	ShelfTreasureGoal         int

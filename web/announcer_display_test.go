@@ -98,7 +98,7 @@ func TestAnnouncerDisplayScorePostedGameFields(t *testing.T) {
 	assert.Equal(t, 200, recorder.Code)
 	body := recorder.Body.String()
 	assert.Contains(t, body, "Auto Treasure")
-	assert.Contains(t, body, "Teleop Top +10") // The crown's location and bonus.
+	assert.Contains(t, body, "Teleop Top 20") // The crown's location and points.
 	assert.Contains(t, body, "Endgame RP")
 	assert.Contains(t, body, "Yes") // Red balanced a robot, so it earns the Endgame RP.
 }

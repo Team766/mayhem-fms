@@ -1,8 +1,8 @@
 // Copyright 2026 Team 254. All Rights Reserved.
 //
-// The worked examples from section 11 of the Medieval Mayhem game spec
-// (specs/2026_medieval_mayhem.md). Every expected number below is copied from the spec; if a change to the scoring
-// code breaks one of these, either the change or the spec is wrong.
+// Worked examples for the Medieval Mayhem game spec (specs/2026_medieval_mayhem.yaml). Every expected number below was
+// worked out by hand from the spec; if a change to the scoring code breaks one of these, either the change or the
+// example is wrong. The treasure counters never include the crown.
 
 package game
 
@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-// The totals the spec's worked examples list for one alliance.
+// The expected totals for one alliance in a worked example.
 type expectedSummary struct {
 	leavePoints          int
 	autoBalancePoints    int
@@ -82,7 +82,7 @@ func exampleAScores() (*Score, *Score) {
 		LeaveStatuses:   [3]bool{true, false, false},
 		AutoFloor:       1,
 		TeleopFloor:     2,
-		TeleopFirst:     3,
+		TeleopFirst:     2,
 		TeleopTop:       1,
 		Crown:           CrownTeleopFirst,
 		EndgameStatuses: [3]EndgameStatus{EndgamePark, EndgameNone, EndgameNone},
@@ -142,7 +142,7 @@ func exampleBScores() (*Score, *Score) {
 		AutoFirst:       1,
 		TeleopFloor:     1,
 		TeleopFirst:     5,
-		TeleopTop:       4,
+		TeleopTop:       3,
 		TeleopStacked:   2,
 		Crown:           CrownTeleopTop,
 		EndgameStatuses: [3]EndgameStatus{EndgameBalance, EndgameBalance, EndgameNone},
@@ -191,7 +191,6 @@ func TestWorkedExampleB(t *testing.T) {
 func exampleCScores() (*Score, *Score) {
 	redScore := &Score{
 		LeaveStatuses:   [3]bool{true, true, false},
-		AutoFirst:       1,
 		Crown:           CrownAutoFirst,
 		TeleopFirst:     2,
 		TeleopTop:       3,

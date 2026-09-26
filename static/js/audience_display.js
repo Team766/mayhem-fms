@@ -107,7 +107,7 @@ const setFinalResultIndicator = function (side, label, result) {
   indicator.attr("data-result", result);
 };
 
-// Populates one alliance's final-score breakdown rows (spec 9.3): the seven point categories, then the three bonus
+// Populates one alliance's final-score breakdown rows: the seven point categories, then the three bonus
 // ranking points as check/cross indicators (hidden in playoffs).
 const setFinalBreakdown = function (side, summary) {
   $(`#${side}FinalLeavePoints`).text(summary.LeavePoints);

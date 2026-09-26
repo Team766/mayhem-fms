@@ -273,8 +273,13 @@ main h2 {
   text-align: center;
 }
 
+.crown-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
 .crown-button {
-  width: 90px;
   height: 56px;
   border-radius: var(--button-border-radius);
   background-color: var(--neutral-action);

@@ -24,7 +24,7 @@ func TestScore1() *Score {
 		AutoTop:             1,
 		TeleopFloor:         3,
 		TeleopFirst:         4,
-		TeleopTop:           2,
+		TeleopTop:           1,
 		TeleopStacked:       1,
 		Crown:               CrownTeleopTop,
 		LeaveStatuses:       [3]bool{true, true, false},

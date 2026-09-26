@@ -26,8 +26,8 @@ type Score struct {
 var AutonRpThreshold = 20
 var ScoringRpThreshold = 12
 
-// Represents where on the field the dragon's crown ended the match, if the alliance scored it. The crown is counted in
-// the ordinary counter for its location like any other treasure; this selection adds that same value again as a bonus.
+// Represents where on the field the dragon's crown ended the match, if the alliance scored it. The treasure counters
+// never include the crown.
 type CrownPlacement int
 
 const (
@@ -41,30 +41,30 @@ const (
 	CrownTeleopStacked
 )
 
-// Returns the bonus that the crown adds to the alliance's score, which is the value of the placement it made.
+// Returns the crown's points, which are twice the value of an ordinary treasure in the same place.
 func (placement CrownPlacement) PointValue() int {
 	switch placement {
 	case CrownAutoFloor:
-		return 4
+		return 8
 	case CrownAutoFirst:
-		return 8
+		return 16
 	case CrownAutoTop:
-		return 12
+		return 24
 	case CrownTeleopFloor:
-		return 2
+		return 4
 	case CrownTeleopFirst:
-		return 5
-	case CrownTeleopTop:
 		return 10
+	case CrownTeleopTop:
+		return 20
 	case CrownTeleopStacked:
-		return 8
+		return 16
 	default:
 		return 0
 	}
 }
 
-// Returns true if the crown was placed during the autonomous period, meaning that its bonus belongs to the auto
-// treasure points and counts toward the Auton ranking point.
+// Returns true if the crown was placed during the autonomous period, meaning that its points belong to the auto
+// treasure points and count toward the Auton ranking point.
 func (placement CrownPlacement) IsAuto() bool {
 	return placement == CrownAutoFloor || placement == CrownAutoFirst || placement == CrownAutoTop
 }
@@ -130,15 +130,15 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 	summary.TeleopTreasurePoints =
 		2*score.TeleopFloor + 5*score.TeleopFirst + 10*score.TeleopTop + 8*score.TeleopStacked
 
-	// The dragon's crown scores double. It is already counted in the ordinary counter for its location, so the bonus
-	// adds that same value again, to the period in which the crown was placed.
+	// The dragon's crown is worth twice an ordinary treasure in the same place. The treasure counters never include it,
+	// so its points are added to the period in which it was placed.
 	summary.Crown = score.Crown
-	summary.CrownBonusPoints = score.Crown.PointValue()
+	summary.CrownPoints = score.Crown.PointValue()
 	if score.Crown.IsAuto() {
-		summary.AutoTreasurePoints += summary.CrownBonusPoints
+		summary.AutoTreasurePoints += summary.CrownPoints
 	} else {
 		// CrownNone is worth zero, so adding it here is harmless.
-		summary.TeleopTreasurePoints += summary.CrownBonusPoints
+		summary.TeleopTreasurePoints += summary.CrownPoints
 	}
 
 	summary.AutonPoints = summary.LeavePoints + summary.AutoBalancePoints + summary.AutoTreasurePoints
@@ -164,11 +164,16 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 	summary.MatchPoints =
 		summary.AutonPoints + summary.TeleopTreasurePoints + summary.EndgamePoints + summary.TossPoints
 
-	// Count treasures for the live displays and for the Scoring ranking point. The crown is one treasure and is counted
-	// once, by the counter it was entered in.
+	// Count treasures for the live displays and for the Scoring ranking point. The crown counts as one treasure.
 	summary.TreasureCount = score.AutoFloor + score.AutoFirst + score.AutoTop + score.TeleopFloor +
 		score.TeleopFirst + score.TeleopTop + score.TeleopStacked
 	summary.ShelfTreasureCount = score.TeleopFirst + score.TeleopTop + score.TeleopStacked
+	if score.Crown != CrownNone {
+		summary.TreasureCount++
+	}
+	if score.Crown == CrownTeleopFirst || score.Crown == CrownTeleopTop || score.Crown == CrownTeleopStacked {
+		summary.ShelfTreasureCount++
+	}
 	summary.ShelfTreasureGoal = ScoringRpThreshold
 
 	// Calculate penalty points.
@@ -188,7 +193,7 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 	summary.AutonRankingPoint = summary.AutonPoints >= AutonRpThreshold || summary.AutonRankingPointByFoul
 
 	// Scoring ranking point: at least the threshold in treasures placed during teleop on the first shelf, on the top
-	// shelf, or stacked. There is no opponent-violation alternative.
+	// shelf, or stacked, counting the crown as one. There is no opponent-violation alternative.
 	summary.ScoringRankingPoint = summary.ShelfTreasureCount >= ScoringRpThreshold
 
 	// Endgame ranking point: at least one robot balanced on its mountain top, or the opponent contacted the alliance's
