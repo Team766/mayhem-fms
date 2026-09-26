@@ -1,18 +1,18 @@
 # Game questions: Medieval Mayhem (M-Ayhem 2026)
 
-Questions for the game authors and event organizers. The spec (`2026_medieval_mayhem.md`) and the FMS use the **default** until a question is answered. When one is answered: fill in the answer and date, change the spec (and its worked examples) if the answer differs from the default, and re-run `docs/agents/apply-game.md` for the affected sections.
+Questions for the game authors and event organizers. The spec (`2026_medieval_mayhem.yaml`) and the FMS use the **default** until a question is answered. When one is answered: fill in the answer and date, change the spec if the answer differs from the default, and re-run `docs/agents/apply-game.md`.
 
 Status: `open`, `answered` (spec updated), `n/a`.
 
 | # | Question | Default in use | Answer | Status |
 |---|----------|----------------|--------|--------|
-| 1 | Crown: does "x2" double only the crown's own placement value, or the alliance's whole score? | only its own placement |  | open |
+| 1 | Crown: does "x2" double only the crown's own placement value, or the alliance's whole score? | only its own placement | Only its own value: the crown is one treasure worth twice the points of its spot (2026-09-25). | answered |
 | 2 | Crown: is there exactly one crown on the field? 4.1.2 says "one of each mound" but also "19 treasures including the crown". | one. |  | open |
-| 3 | Crown: may it be stacked (16), and does it count once toward the 12-treasure Scoring RP? | yes, once. |  | open |
-| 4 | A treasure stacked during auto "is scored as regular points": is that the auto value of the level beneath it (4/8/12), the flat stacked 8, or the teleop level value? | auto value of the level beneath it (4/8/12) |  | open |
+| 3 | Crown: may it be stacked (16), and does it count once toward the 12-treasure Scoring RP? | yes, once. | Yes: a stacked crown scores 16, and it counts as one treasure toward the Scoring RP (2026-09-25). | answered |
+| 4 | A treasure stacked during auto "is scored as regular points": is that the auto value of the level beneath it (4/8/12), the flat stacked 8, or the teleop level value? | auto value of the level beneath it (4/8/12) | Stacking is not a consideration in auto: a treasure counts at the auto value of the level it is on (2026-09-25). | answered |
 | 5 | Does an auto placement have to stay in place until the end of the match to score, and does it then keep its auto value? | yes to both. |  | open |
 | 6 | 4.3 says endgame scoring is "as in auton or teleop". Do endgame-period placements score at teleop values? | yes. |  | open |
-| 7 | Does a treasure stacked on a FLOOR treasure count toward the Scoring RP ("on first and top shelves ... including stacked")? | yes, all stacked treasures count (one Stacked counter). |  | open |
+| 7 | Does a treasure stacked on a FLOOR treasure count toward the Scoring RP ("on first and top shelves ... including stacked")? | yes, all stacked treasures count (one Stacked counter). | Yes: stacked is its own teleop level, and every stacked treasure counts (2026-09-25). | answered |
 | 8 | Are auto balance (12) and endgame balance (12) per robot, so two robots earn 24? | per robot. |  | open |
 | 9 | Safe-house park (2): what exactly qualifies (fully inside own safe house at the end?), is it per robot, and is it exclusive with balance? 2.3.3 omits it and the table cites 4.1.3, which does not define it. | per robot, fully inside at the end, exclusive with balance. |  | open |
 | 10 | Endgame RP says "parked on balance beam": must the robot meet the full 12-point balanced condition? | yes, the RP needs one robot scored as Balance. |  | open |
@@ -29,7 +29,7 @@ Status: `open`, `answered` (spec updated), `n/a`.
 | 21 | Red card in a qualification match: does only the carded team lose its RP and points (stock FMS), or does the whole alliance score 0? | only the carded team (upstream behaviour) |  | open |
 | 22 | Did-not-start (6.6) is garbled. Does a bypassed team whose drive team is present receive its alliance's RPs? | yes; only a no-show (red card) gets 0. |  | open |
 | 23 | Tied playoff match: the manual gives no procedure, and 6.2 says no replays. | fewer major fouls committed, then more auton points, then more match points without fouls, then replay. |  | open |
-| 24 | Playoff bracket: single-game semifinals and a best-of-three final need a base change; the base plays best of three in every round. | use the base bracket unchanged with 4 alliances. |  | open |
+| 24 | Playoff bracket: the manual plays one game per round and a best-of-three final. | the base's "one game per round until a best-of-three final" playoff type. |  | open |
 | 25 | Length of the pause between auto and teleop? | 3 s. |  | open |
 | 26 | The manual describes air horns at auto start, teleop start, endgame start and match end. Replace the stock sounds? | keep stock sounds, add only `toss.wav`. Who supplies `toss.wav`? |  | open |
 | 27 | Is the balance-beam indicator light standalone hardware, or should the FMS read it? | standalone hardware; the FMS does not read it |  | open |
