@@ -5,6 +5,10 @@ package game
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -61,8 +65,8 @@ func TestRuleCounts(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 30, len(rules))
-	assert.Equal(t, 15, numMajor)
+	assert.Equal(t, 32, len(rules))
+	assert.Equal(t, 17, numMajor)
 	assert.Equal(t, 15, numMinor)
 	assert.Equal(t, 3, numRankingPoint)
 }
@@ -91,5 +95,61 @@ func TestRankingPointRules(t *testing.T) {
 			}
 		}
 		assert.Equal(t, map[bool]int{false: 1, true: 1}, severities, "%s", ruleNumber)
+	}
+}
+
+// Checks that the rules list matches the table in specs/RULES.md, row for row.
+func TestRulesMatchSpecTable(t *testing.T) {
+	specText, err := os.ReadFile("../specs/RULES.md")
+	assert.Nil(t, err)
+
+	var tableRows [][]string
+	for _, line := range strings.Split(string(specText), "\n") {
+		if !strings.HasPrefix(line, "| ") {
+			continue
+		}
+		cells := strings.Split(strings.Trim(line, "| "), " | ")
+		if cells[0] == "Id" || strings.HasPrefix(cells[0], "---") {
+			continue // Header and separator rows.
+		}
+		tableRows = append(tableRows, cells)
+	}
+
+	if assert.Equal(t, len(rules), len(tableRows)) {
+		for i, rule := range rules {
+			cells := tableRows[i]
+			if assert.Equal(t, 4, len(cells), "row %d", i+1) {
+				assert.Equal(t, strconv.Itoa(rule.Id), cells[0])
+				assert.Equal(t, rule.RuleNumber, cells[1])
+				assert.Equal(t, rule.IsMajor, cells[2] == "Major", "%s", rule.RuleNumber)
+				assert.Equal(t, rule.Description, cells[3])
+			}
+		}
+	}
+}
+
+// Checks that every rule the game spec says gives the opponent a ranking point is in the list and flagged as such, and
+// that no other rule is flagged.
+func TestRankingPointRulesMatchGameSpec(t *testing.T) {
+	specText, err := os.ReadFile("../specs/2026_medieval_mayhem.yaml")
+	assert.Nil(t, err)
+
+	specRuleNumbers := map[string]bool{}
+	for _, match := range regexp.MustCompile(`opponent_fouls: \[([^\]]*)\]`).FindAllStringSubmatch(string(specText), -1) {
+		for _, ruleNumber := range strings.Split(match[1], ",") {
+			specRuleNumbers[strings.TrimSpace(ruleNumber)] = true
+		}
+	}
+	assert.NotEmpty(t, specRuleNumbers)
+
+	for _, rule := range rules {
+		assert.Equal(t, specRuleNumbers[rule.RuleNumber], rule.IsRankingPoint, "%s", rule.RuleNumber)
+	}
+	for ruleNumber := range specRuleNumbers {
+		found := false
+		for _, rule := range rules {
+			found = found || rule.RuleNumber == ruleNumber
+		}
+		assert.True(t, found, "%s is in the game spec but not in the rules list", ruleNumber)
 	}
 }
