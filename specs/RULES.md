@@ -25,7 +25,7 @@ This is the foul list the FMS offers referees, taken from section 4.5 of the 202
 | 19 | MA2607 | Minor | Putting a treasure into the field other than through the human loading holes (not during the Toss). |
 | 20 | MA2608 | Minor | Loaded treasure does not first touch an own-alliance robot or the human loading zone floor. |
 | 21 | MA2609 | Minor | Contacting own shelf repeatedly or in an unsafe manner. |
-| 22 | MA2610 | Minor | Starting auto with more than 1 treasure. That robot cannot earn auto placement points. |
+| 22 | MA2610 | Minor | Starting auto with more than 1 treasure. Treasures that robot places in auto do not count. |
 | 23 | MA2611 | Minor | Descoring the other alliance's treasures. Can stack with MA2620. |
 | 24 | MA2612 | Minor | Robot deliberately destroying a treasure. |
 | 25 | MA2613 | Minor | Adding treasures to the field during endgame. The treasure does not count. |

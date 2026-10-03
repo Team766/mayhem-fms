@@ -40,7 +40,7 @@ var rules = []*Rule{
 	{19, "MA2607", false, false, "Putting a treasure into the field other than through the human loading holes (not during the Toss)."},
 	{20, "MA2608", false, false, "Loaded treasure does not first touch an own-alliance robot or the human loading zone floor."},
 	{21, "MA2609", false, false, "Contacting own shelf repeatedly or in an unsafe manner."},
-	{22, "MA2610", false, false, "Starting auto with more than 1 treasure. That robot cannot earn auto placement points."},
+	{22, "MA2610", false, false, "Starting auto with more than 1 treasure. Treasures that robot places in auto do not count."},
 	{23, "MA2611", false, false, "Descoring the other alliance's treasures. Can stack with MA2620."},
 	{24, "MA2612", false, false, "Robot deliberately destroying a treasure."},
 	{25, "MA2613", false, false, "Adding treasures to the field during endgame. The treasure does not count."},
