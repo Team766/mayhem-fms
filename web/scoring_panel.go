@@ -30,7 +30,7 @@ func (position ScoringPosition) ShowsNear() bool {
 	return position.Side == "" || position.Side == "near"
 }
 
-// ShowsFar returns true if this position's panel should show the FAR (robot scorer) controls.
+// ShowsFar returns true if this position's panel should show the FAR (robot and crown scorer) controls.
 func (position ScoringPosition) ShowsFar() bool {
 	return position.Side == "" || position.Side == "far"
 }

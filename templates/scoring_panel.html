@@ -20,25 +20,12 @@ UI for entering realtime scores.
       {{template "counterRow" dict "id" "auto_first" "label" "First Shelf"}}
       {{template "counterRow" dict "id" "auto_top" "label" "Top Shelf"}}
     </div>
-    <h2>Auto crown</h2>
-    <div class="crown-group">
-      {{template "crownButton" dict "id" "auto_floor" "label" "Floor"}}
-      {{template "crownButton" dict "id" "auto_first" "label" "First Shelf"}}
-      {{template "crownButton" dict "id" "auto_top" "label" "Top Shelf"}}
-    </div>
     <h2>Teleop treasure</h2>
     <div class="counter-group">
       {{template "counterRow" dict "id" "teleop_floor" "label" "Floor"}}
       {{template "counterRow" dict "id" "teleop_first" "label" "First Shelf"}}
       {{template "counterRow" dict "id" "teleop_top" "label" "Top Shelf"}}
       {{template "counterRow" dict "id" "teleop_stacked" "label" "Stacked"}}
-    </div>
-    <h2>Teleop crown</h2>
-    <div class="crown-group">
-      {{template "crownButton" dict "id" "teleop_floor" "label" "Floor"}}
-      {{template "crownButton" dict "id" "teleop_first" "label" "First Shelf"}}
-      {{template "crownButton" dict "id" "teleop_top" "label" "Top Shelf"}}
-      {{template "crownButton" dict "id" "teleop_stacked" "label" "Stacked"}}
     </div>
   </section>
   {{end}}
@@ -55,6 +42,19 @@ UI for entering realtime scores.
           onclick="toggleAutoBalance({{$i}});">Auto Balance</button>
       </div>
       {{end}}
+    </div>
+    <h2>Auto crown</h2>
+    <div class="crown-group">
+      {{template "crownButton" dict "id" "auto_floor" "label" "Floor"}}
+      {{template "crownButton" dict "id" "auto_first" "label" "First Shelf"}}
+      {{template "crownButton" dict "id" "auto_top" "label" "Top Shelf"}}
+    </div>
+    <h2>Teleop crown</h2>
+    <div class="crown-group">
+      {{template "crownButton" dict "id" "teleop_floor" "label" "Floor"}}
+      {{template "crownButton" dict "id" "teleop_first" "label" "First Shelf"}}
+      {{template "crownButton" dict "id" "teleop_top" "label" "Top Shelf"}}
+      {{template "crownButton" dict "id" "teleop_stacked" "label" "Stacked"}}
     </div>
     <h2>Endgame</h2>
     <div class="robot-group">

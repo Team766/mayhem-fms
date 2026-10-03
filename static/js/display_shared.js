@@ -87,12 +87,14 @@
       this.setScoreStats(blueSide, data.Blue.ScoreSummary, isPlayoff);
     },
 
-    // Updates the two live in-match stats (treasure count and shelf-treasure progress) shown beside the score.
+    // Updates the two live in-match stats shown beside the score: the treasure count and, in qualification matches,
+    // progress toward the Scoring ranking point (playoffs have no ranking points).
     setScoreStats: function (side, summary, isPlayoff) {
-      $(`#${side}Treasure`).text(summary.TreasureCount);
-      $(`#${side}Shelf`).text(
-        isPlayoff ? summary.ShelfTreasureCount : `${summary.ShelfTreasureCount}/${summary.ShelfTreasureGoal}`
-      );
+      const treasures = summary.TreasureCount;
+      $(`#${side}Treasure`).text(`${treasures} ${treasures === 1 ? "Treasure" : "Treasures"}`);
+      const count = summary.ShelfTreasureCount;
+      const goal = summary.ShelfTreasureGoal;
+      $(`#${side}ScoringRp`).text(isPlayoff ? "" : `Scoring RP ${count}/${goal}${count >= goal ? " \u2714" : ""}`);
     },
   };
 })(window);

@@ -31,17 +31,18 @@ func TestScoringPanel(t *testing.T) {
 		if parameters.ShowsNear() {
 			assert.Contains(t, body, "Auto treasure")
 			assert.Contains(t, body, "Stacked")
-			assert.Contains(t, body, "Teleop crown")
-			assert.Contains(t, body, "crown-auto_top")
-			assert.Contains(t, body, "crown-teleop_stacked")
 		} else {
 			assert.NotContains(t, body, "Auto treasure")
 		}
 		if parameters.ShowsFar() {
+			assert.Contains(t, body, "Teleop crown")
+			assert.Contains(t, body, "crown-auto_top")
+			assert.Contains(t, body, "crown-teleop_stacked")
 			assert.Contains(t, body, "The Toss")
 			assert.Contains(t, body, "Balance")
 		} else {
 			assert.NotContains(t, body, "The Toss")
+			assert.NotContains(t, body, "Teleop crown")
 		}
 	}
 }
@@ -109,7 +110,7 @@ func TestScoringPanelWebsocket(t *testing.T) {
 		Adjustment int
 	}{"nonexistent", 1})
 
-	redNearWs.Write("crown", struct{ Value string }{"teleop_top"})
+	redFarWs.Write("crown", struct{ Value string }{"teleop_top"})
 	readWebsocketType(t, redNearWs, "realtimeScore")
 	readWebsocketType(t, redFarWs, "realtimeScore")
 	readWebsocketType(t, blueWs, "realtimeScore")

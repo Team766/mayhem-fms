@@ -74,7 +74,7 @@ statuses:
     game_piece: crown
     scoring_group: treasure
     per: alliance
-    scorer: near
+    scorer: far
     phases:                     # one value across both phases
       - { phase: auto, values: { floor: 8, first_shelf: 16, top_shelf: 24 } }
       - { phase: teleop, values: { floor: 4, first_shelf: 10, top_shelf: 20, stacked: 16 } }
