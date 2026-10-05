@@ -51,12 +51,6 @@
   <div class="col-sm-4">{{.summary.TeleopTreasurePoints}}</div>
 </div>
 <div class="row justify-content-center">
-  <div class="col-sm-6">Crown</div>
-  <div class="col-sm-4">
-    {{if .summary.Crown}}{{.summary.Crown.String}} {{.summary.CrownPoints}}{{else}}-{{end}}
-  </div>
-</div>
-<div class="row justify-content-center">
   <div class="col-sm-6">Endgame</div>
   <div class="col-sm-4">{{.summary.EndgamePoints}}</div>
 </div>
@@ -72,7 +66,7 @@
 <div class="row justify-content-center">
   <div class="col-sm-6">Auton RP</div>
   <div class="col-sm-4">
-    {{if .summary.AutonRankingPoint}}Yes{{if .summary.AutonRankingPointByFoul}} (foul){{end}}{{else}}No{{end}}
+    {{if .summary.AutonRankingPoint}}Yes{{else}}No{{end}}
   </div>
 </div>
 <div class="row justify-content-center">
@@ -82,7 +76,7 @@
 <div class="row justify-content-center">
   <div class="col-sm-6">Endgame RP</div>
   <div class="col-sm-4">
-    {{if .summary.EndgameRankingPoint}}Yes{{if .summary.EndgameRankingPointByFoul}} (foul){{end}}{{else}}No{{end}}
+    {{if .summary.EndgameRankingPoint}}Yes{{else}}No{{end}}
   </div>
 </div>
 {{end}}

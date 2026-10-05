@@ -93,8 +93,10 @@ func TestAnnouncerDisplayScorePostedGameFields(t *testing.T) {
 
 	recorder := web.getHttpResponse("/displays/announcer/score_posted")
 	assert.Equal(t, 200, recorder.Code)
-	// "Teleop Top 20" is the crown's location and points; "Yes" is for the Endgame RP, since red balanced a robot.
-	for _, expected := range []string{"Auto Treasure", "Teleop Top 20", "Endgame RP", "Yes"} {
+	// "Yes" is for the Endgame RP, since red balanced a robot. The crown has no row of its own: its points are inside
+	// Teleop Treasure (40 = 2 x 10 + 20).
+	assert.NotContains(t, recorder.Body.String(), ">Crown<")
+	for _, expected := range []string{"Auto Treasure", ">40<", "Endgame RP", "Yes"} {
 		assert.Contains(t, recorder.Body.String(), expected)
 	}
 }

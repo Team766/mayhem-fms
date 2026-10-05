@@ -93,6 +93,10 @@ UI for entering and tracking fouls and red/yellow cards.
 <link href="/static/css/referee_panel.css" rel="stylesheet">
 {{end}}
 {{define "script"}}
+<script>
+  // The display name of each crown placement, indexed by its value, from the game package.
+  const crownPlacementLabels = {{.CrownLabelsJson}};
+</script>
 <script src="/static/js/match_timing.js"></script>
 <script src="/static/js/referee_panel.js"></script>
 {{end}}
@@ -132,6 +136,6 @@ UI for entering and tracking fouls and red/yellow cards.
   {{range $i := seq $teamCount}}{{if eq $i 1}}<div id="{{$.id}}Toss">-</div>{{else}}<div>&nbsp;</div>{{end}}{{end}}
 
   <div>Scoring RP</div>
-  {{range $i := seq $teamCount}}{{if eq $i 1}}<div id="{{$.id}}Shelf">-</div>{{else}}<div>&nbsp;</div>{{end}}{{end}}
+  {{range $i := seq $teamCount}}{{if eq $i 1}}<div id="{{$.id}}ScoringRp">-</div>{{else}}<div>&nbsp;</div>{{end}}{{end}}
 </div>
 {{end}}

@@ -6,17 +6,17 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-	"strconv"
-
 	"github.com/Team254/cheesy-arena/field"
 	"github.com/Team254/cheesy-arena/game"
 	"github.com/Team254/cheesy-arena/model"
 	"github.com/Team254/cheesy-arena/websocket"
 	"github.com/mitchellh/mapstructure"
+	"io"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 // Renders the referee interface for assigning fouls.
@@ -31,9 +31,16 @@ func (web *Web) refereePanelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// The templates are text/template, so the labels are encoded here for the page's script.
+	crownLabelsJson, err := json.Marshal(game.CrownLabels())
+	if err != nil {
+		handleWebErr(w, err)
+		return
+	}
 	data := struct {
 		*model.EventSettings
-	}{web.arena.EventSettings}
+		CrownLabelsJson string
+	}{web.arena.EventSettings, string(crownLabelsJson)}
 	err = template.ExecuteTemplate(w, "base_no_navbar", data)
 	if err != nil {
 		handleWebErr(w, err)

@@ -9,7 +9,7 @@ import "math/rand"
 
 type RankingFields struct {
 	RankingPoints     int
-	ScorePoints       int
+	ScorePoints       int // Sum of ScoreSummary.Score, which includes foul points (not MatchPoints, which doesn't).
 	AutonPoints       int
 	Random            float64
 	Wins              int

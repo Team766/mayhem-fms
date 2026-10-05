@@ -45,16 +45,11 @@ UI for entering realtime scores.
     </div>
     <h2>Auto crown</h2>
     <div class="crown-group">
-      {{template "crownButton" dict "id" "auto_floor" "label" "Floor"}}
-      {{template "crownButton" dict "id" "auto_first" "label" "First Shelf"}}
-      {{template "crownButton" dict "id" "auto_top" "label" "Top Shelf"}}
+      {{range .CrownSpots}}{{if eq .Phase "Auto"}}{{template "crownButton" .}}{{end}}{{end}}
     </div>
     <h2>Teleop crown</h2>
     <div class="crown-group">
-      {{template "crownButton" dict "id" "teleop_floor" "label" "Floor"}}
-      {{template "crownButton" dict "id" "teleop_first" "label" "First Shelf"}}
-      {{template "crownButton" dict "id" "teleop_top" "label" "Top Shelf"}}
-      {{template "crownButton" dict "id" "teleop_stacked" "label" "Stacked"}}
+      {{range .CrownSpots}}{{if eq .Phase "Teleop"}}{{template "crownButton" .}}{{end}}{{end}}
     </div>
     <h2>Endgame</h2>
     <div class="robot-group">
@@ -104,5 +99,6 @@ UI for entering realtime scores.
 {{end}}
 
 {{define "crownButton"}}
-<button id="crown-{{.id}}" class="crown-button scoring-button" ontouchstart disabled onclick="toggleCrown('{{.id}}');">{{.label}}</button>
+<button id="crown-{{.Id}}" class="crown-button scoring-button" data-value="{{printf "%d" .Placement}}" ontouchstart disabled
+  onclick="toggleCrown('{{.Id}}', {{printf "%d" .Placement}});">{{.Spot}}</button>
 {{end}}

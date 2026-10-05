@@ -98,8 +98,8 @@ UI for manually editing the result for a match.
       <legend>Autonomous</legend>
       <div class="row mb-3">
         {{template "counterInput" dict "alliance" .Alliance "field" "AutoFloor" "label" "Floor"}}
-        {{template "counterInput" dict "alliance" .Alliance "field" "AutoFirst" "label" "First"}}
-        {{template "counterInput" dict "alliance" .Alliance "field" "AutoTop" "label" "Top"}}
+        {{template "counterInput" dict "alliance" .Alliance "field" "AutoFirst" "label" "First Shelf"}}
+        {{template "counterInput" dict "alliance" .Alliance "field" "AutoTop" "label" "Top Shelf"}}
       </div>
       {{range $i, $team := .Teams}}
       <div class="row mb-2">
@@ -121,8 +121,8 @@ UI for manually editing the result for a match.
       <legend>Teleop + Endgame</legend>
       <div class="row mb-3">
         {{template "counterInput" dict "alliance" .Alliance "field" "TeleopFloor" "label" "Floor"}}
-        {{template "counterInput" dict "alliance" .Alliance "field" "TeleopFirst" "label" "First"}}
-        {{template "counterInput" dict "alliance" .Alliance "field" "TeleopTop" "label" "Top"}}
+        {{template "counterInput" dict "alliance" .Alliance "field" "TeleopFirst" "label" "First Shelf"}}
+        {{template "counterInput" dict "alliance" .Alliance "field" "TeleopTop" "label" "Top Shelf"}}
         {{template "counterInput" dict "alliance" .Alliance "field" "TeleopStacked" "label" "Stacked"}}
       </div>
     </fieldset>
@@ -132,13 +132,7 @@ UI for manually editing the result for a match.
         <div class="col-lg-4">
           <select class="form-control" name="{{.Alliance}}Crown">
             <option value="0">None</option>
-            <option value="1">Auto Floor</option>
-            <option value="2">Auto First</option>
-            <option value="3">Auto Top</option>
-            <option value="4">Teleop Floor</option>
-            <option value="5">Teleop First</option>
-            <option value="6">Teleop Top</option>
-            <option value="7">Teleop Stacked</option>
+            {{range .CrownSpots}}<option value="{{printf "%d" .Placement}}">{{.Placement}}</option>{{end}}
           </select>
         </div>
       </div>

@@ -81,7 +81,7 @@ const updateResults = function (alliance) {
   result.score.EndgameStatuses = [];
   for (let i = 0; i < NUM_ROBOTS; i++) {
     const i1 = i + 1;
-    // A station that isn't rendered (e.g. station 3 in 2v2 mode) keeps its prior, already-zero value.
+    // A station that isn't rendered (e.g. station 3 in 2v2 mode) is reset to no leave, no balance and no endgame.
     if (i < result.teams.length) {
       result.score.LeaveStatuses[i] = formData[`${alliance}LeaveStatuses${i1}`] === "on";
       result.score.AutoBalanceStatuses[i] = formData[`${alliance}AutoBalanceStatuses${i1}`] === "on";
