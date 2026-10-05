@@ -208,6 +208,15 @@ func (web *Web) matchReviewEditPostHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	normalizeMatchResult(&matchResult)
+	for _, alliance := range []struct {
+		name  string
+		score *game.Score
+	}{{"Red", matchResult.RedScore}, {"Blue", matchResult.BlueScore}} {
+		if err = alliance.score.Validate(); err != nil {
+			handleWebErr(w, fmt.Errorf("Error: %s score: %v", alliance.name, err))
+			return
+		}
+	}
 
 	if isCurrent {
 		// If editing the current match, just save it back to memory.
