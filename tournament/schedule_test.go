@@ -146,9 +146,9 @@ func TestScheduleTwoVsTwo(t *testing.T) {
 		matchesPerTeam int
 		numMatches     int
 	}{
+		{4, 14},
 		{8, 28},
 		{10, 35},
-		{12, 42},
 	} {
 		scheduleBlocks := []model.ScheduleBlock{
 			{
@@ -182,6 +182,59 @@ func TestScheduleTwoVsTwo(t *testing.T) {
 			assert.Equal(t, tc.matchesPerTeam, teamMatchCounts[team.Id])
 		}
 	}
+}
+
+func TestScheduleTwoVsTwoSurrogates(t *testing.T) {
+	setupTestDb(t)
+
+	// 13 teams playing 5 matches is 65 appearances, which is 17 matches with 3 surrogate appearances.
+	numTeams := 13
+	teams := make([]model.Team, numTeams)
+	for i := 0; i < numTeams; i++ {
+		teams[i].Id = i + 1
+	}
+	scheduleBlocks := []model.ScheduleBlock{
+		{
+			MatchType:       model.Qualification,
+			StartTime:       time.Unix(0, 0).UTC(),
+			NumMatches:      17,
+			MatchSpacingSec: 60,
+		},
+	}
+	matches, err := BuildRandomSchedule(teams, scheduleBlocks, model.Qualification, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 17, len(matches))
+
+	countedMatches := make(map[int]int)
+	surrogateMatches := make(map[int]int)
+	for _, match := range matches {
+		assert.Equal(t, 0, match.Red3)
+		assert.Equal(t, 0, match.Blue3)
+		assert.False(t, match.Red3IsSurrogate)
+		assert.False(t, match.Blue3IsSurrogate)
+		for _, appearance := range []struct {
+			teamId      int
+			isSurrogate bool
+		}{
+			{match.Red1, match.Red1IsSurrogate},
+			{match.Red2, match.Red2IsSurrogate},
+			{match.Blue1, match.Blue1IsSurrogate},
+			{match.Blue2, match.Blue2IsSurrogate},
+		} {
+			if appearance.isSurrogate {
+				surrogateMatches[appearance.teamId]++
+			} else {
+				countedMatches[appearance.teamId]++
+			}
+		}
+	}
+	totalSurrogates := 0
+	for _, team := range teams {
+		assert.Equal(t, 5, countedMatches[team.Id])
+		assert.LessOrEqual(t, surrogateMatches[team.Id], 1)
+		totalSurrogates += surrogateMatches[team.Id]
+	}
+	assert.Equal(t, 3, totalSurrogates)
 }
 
 func assertMatch(
