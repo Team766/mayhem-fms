@@ -23,6 +23,7 @@ re-applied as intent. `UPSTREAM.md` records the last upstream commit that was re
 2. **Stay textually close to upstream.** Where you are only removing, delete whole lines or blocks. Do not reflow, rename, regroup imports or reformat. Imports stay alphabetical and ungrouped.
 3. **Remove completely**, as `DEVELOPMENT.md` defines it, and keep what it says must survive.
 4. **Keep the module path** `github.com/Team254/cheesy-arena`, so upstream diffs stay comparable.
+   The README is ours: keep it, and bring over an upstream README change only where it still applies (for example, a new required Go version or command-line flag).
 5. **PLC signal order is an interface** with fixed-address hardware. Never reorder the generic signals; run `go generate ./...` after any change to a signal list.
 6. **The game is not your job.** In `update` mode leave game code alone. In `regenerate` mode stop at the no-game state; `apply-game` follows as its own pull request.
 7. New branch. Use the upstream refs already fetched unless asked to fetch, and say which commit you used. Do not push or open pull requests unless asked. If you think you need a destructive command, stop and ask.
