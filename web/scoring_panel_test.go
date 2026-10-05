@@ -20,6 +20,12 @@ func TestScoringPanel(t *testing.T) {
 	assert.Equal(t, 500, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), "Invalid position")
 
+	// The Panel menu links every scoring position.
+	recorder = web.getHttpResponse("/")
+	for _, position := range []string{"red", "blue", "red_near", "red_far", "blue_near", "blue_far"} {
+		assert.Contains(t, recorder.Body.String(), `href="/panels/scoring/`+position+`"`)
+	}
+
 	// All six positions should render, each with the controls appropriate to it.
 	for _, position := range []string{"red", "blue", "red_near", "red_far", "blue_near", "blue_far"} {
 		recorder = web.getHttpResponse("/panels/scoring/" + position)
