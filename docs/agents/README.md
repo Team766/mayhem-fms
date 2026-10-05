@@ -9,8 +9,8 @@ Two playbooks keep this FMS current. They are plain Markdown so any coding agent
 
 Always two phases with a commit between them: first the base, reviewed against upstream; then the game,
 reviewed against the base. A typical year: `sync-upstream` to the latest upstream release in the autumn,
-write `specs/<year>_<name>.md`, `apply-game`, iterate on the spec as the rules settle, then freeze a
-release branch for the event.
+write `specs/game_spec.yaml`, `apply-game`, iterate on the spec as the rules settle, then freeze a
+release branch or tag for the event.
 
 Background and contracts: [../DEVELOPMENT.md](../DEVELOPMENT.md), [../TwoVTwo.md](../TwoVTwo.md), [../ArduinoPlc.md](../ArduinoPlc.md).
 

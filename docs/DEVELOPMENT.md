@@ -67,22 +67,21 @@ The bench test is in [ArduinoPlc.md](ArduinoPlc.md). Run it after any sync that 
 
 ## The game
 
-The tree always carries exactly one game: the current year's. Its spec is in `specs/`, and `specs/CURRENT` names
-it. `apply-game` reads the `CURRENT` spec to learn what is being replaced, applies the new spec, and points
-`CURRENT` at it. Old specs stay as history and examples.
+The tree always carries exactly one game: the current year's, described by `specs/game_spec.yaml`. Earlier games
+live in git history. `apply-game` reads the previous version of the spec to learn what is being replaced. The
+game arrives as three pull requests: the spec, the rules (`specs/RULES.md`, in the manual's words) and the code.
 
 **What counts as game code (the seam):** the score model and its math, ranking order and tiebreaks, the rules
 list and foul values, match timing and sounds; every screen or report that lets someone enter a score, or that
-reads the score, the summary or the rankings; tunable game settings; the game's logos and sounds; and the test
-fixtures that embed a score. Wiring the game's timing and tunable settings into the arena's settings loader counts
-as game code too. A game change that touches anything else (arena behaviour, the PLC, networking, playoffs, 2v2)
+reads the score, the summary or the rankings; the game's logos and sounds; and the test fixtures that embed a
+score. The game's default match timing counts as game code too. A game change that touches anything else (arena behaviour, the PLC, networking, playoffs, 2v2)
 is a base change and gets its own pull request.
 
 **The no-game state.** Right after a regeneration, before a game is applied, the tree must still build, pass its
 tests and run a match: a score is only fouls and the playoff disqualification flag; ranking is by ranking points
 (win 3, tie 1), then match points; a tied playoff match goes to the alliance with fewer major fouls; timing is
 auto, pause, teleop and a warning; the scoring panel shows only Commit; displays show teams, score and timer;
-the rules list keeps only the general rules ([`specs/GENERAL_RULES.md`](../specs/GENERAL_RULES.md)) and foul values stay upstream's, until a game replaces them; no game settings.
+the rules list keeps only the general rules ([`specs/GENERAL_RULES.md`](../specs/GENERAL_RULES.md)) and foul values stay upstream's, until a game replaces them; there is no `specs/game_spec.yaml` or `specs/RULES.md`.
 
 ## What survives a regeneration untouched
 
