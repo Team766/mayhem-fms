@@ -26,17 +26,6 @@ const counterFields = {
   teleop_stacked: "TeleopStacked",
 };
 
-// The CrownPlacement enum value corresponding to each counter id that the crown can be placed on.
-const crownValueByCounter = {
-  auto_floor: 1,
-  auto_first: 2,
-  auto_top: 3,
-  teleop_floor: 4,
-  teleop_first: 5,
-  teleop_top: 6,
-  teleop_stacked: 7,
-};
-
 // The currently-known crown placement, used to decide whether tapping a crown button sets or clears it.
 let currentCrown = 0;
 
@@ -98,8 +87,8 @@ const handleRealtimeScore = function (data) {
   });
 
   currentCrown = score.Crown;
-  $.each(crownValueByCounter, function (id, value) {
-    $(`#crown-${id}`).attr("data-selected", value === currentCrown);
+  $(".crown-button").each(function () {
+    $(this).attr("data-selected", Number($(this).data("value")) === currentCrown);
   });
 
   for (let i = 1; i <= 3; i++) {
@@ -121,10 +110,9 @@ const adjustCounter = function (counter, adjustment) {
   websocket.send("treasure", {Counter: counter, Adjustment: adjustment});
 };
 
-// Sends a websocket message to set or clear the crown at the given counter's location.
-const toggleCrown = function (counter) {
-  const value = currentCrown === crownValueByCounter[counter] ? "none" : counter;
-  websocket.send("crown", {Value: value});
+// Sends a websocket message to set the crown at the given spot, or to clear it if it is already there.
+const toggleCrown = function (id, placement) {
+  websocket.send("crown", {Value: currentCrown === placement ? "none" : id});
 };
 
 // Sends a websocket message to toggle whether the given robot left its safe house during auto.

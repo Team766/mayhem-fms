@@ -66,16 +66,17 @@ var positionParameters = map[string]ScoringPosition{
 	},
 }
 
-// The dragon's crown placements, keyed by the id used in the "crown" websocket command.
-var crownPlacementsByName = map[string]game.CrownPlacement{
-	"none":           game.CrownNone,
-	"auto_floor":     game.CrownAutoFloor,
-	"auto_first":     game.CrownAutoFirst,
-	"auto_top":       game.CrownAutoTop,
-	"teleop_floor":   game.CrownTeleopFloor,
-	"teleop_first":   game.CrownTeleopFirst,
-	"teleop_top":     game.CrownTeleopTop,
-	"teleop_stacked": game.CrownTeleopStacked,
+// Returns the crown placement for an id sent by the scoring panel's "crown" command, from game.CrownSpots.
+func crownPlacementById(id string) (game.CrownPlacement, bool) {
+	if id == "none" {
+		return game.CrownNone, true
+	}
+	for _, spot := range game.CrownSpots {
+		if spot.Id == id {
+			return spot.Placement, true
+		}
+	}
+	return game.CrownNone, false
 }
 
 // Renders the scoring interface which enables input of scores in real-time.
@@ -100,7 +101,8 @@ func (web *Web) scoringPanelHandler(w http.ResponseWriter, r *http.Request) {
 		*model.EventSettings
 		PositionName string
 		Position     ScoringPosition
-	}{web.arena.EventSettings, position, parameters}
+		CrownSpots   []game.CrownSpot
+	}{web.arena.EventSettings, position, parameters, game.CrownSpots}
 	err = template.ExecuteTemplate(w, "base_no_navbar", data)
 	if err != nil {
 		handleWebErr(w, err)
@@ -204,7 +206,7 @@ func (web *Web) scoringPanelWebsocketHandler(w http.ResponseWriter, r *http.Requ
 				continue
 			}
 
-			if placement, ok := crownPlacementsByName[args.Value]; ok {
+			if placement, ok := crownPlacementById(args.Value); ok {
 				score.Crown = placement
 				scoreChanged = true
 			}

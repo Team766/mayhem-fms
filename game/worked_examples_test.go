@@ -78,14 +78,13 @@ var workedExamples = func() []workedExample {
 	}
 	cRedWant := W{
 		LeavePoints: 8, AutoTreasurePoints: 16, AutonPoints: 24, TeleopTreasurePoints: 40, EndgamePoints: 4,
-		TossPoints: 2, Crown: CrownAutoFirst, CrownPoints: 16, TreasureCount: 6, ShelfTreasureCount: 5, MatchPoints: 70,
+		TossPoints: 2, TreasureCount: 6, ShelfTreasureCount: 5, MatchPoints: 70,
 		FoulPoints: 25, Score: 95, AutonRankingPoint: true, BonusRankingPoints: 1, NumOpponentMajorFouls: 2,
 	}
 	// Blue earns both of its ranking points through red's violations; red earns its own on points.
 	cBlueWant := W{
 		LeavePoints: 4, AutonPoints: 4, TeleopTreasurePoints: 23, TreasureCount: 6, ShelfTreasureCount: 2,
-		MatchPoints: 27, FoulPoints: 30, Score: 57, AutonRankingPoint: true, AutonRankingPointByFoul: true,
-		EndgameRankingPoint: true, EndgameRankingPointByFoul: true, BonusRankingPoints: 2, NumOpponentMajorFouls: 3,
+		MatchPoints: 27, FoulPoints: 30, Score: 57, AutonRankingPoint: true, EndgameRankingPoint: true, BonusRankingPoints: 2, NumOpponentMajorFouls: 3,
 	}
 
 	// Example C2: red's auto foul is entered as a major foul with no rule selected. Blue keeps its 30 foul points and
@@ -94,7 +93,6 @@ var workedExamples = func() []workedExample {
 	c2Red.Fouls = majors(0, ruleIdMa2601, ruleIdMa2602)
 	c2BlueWant := cBlueWant
 	c2BlueWant.AutonRankingPoint = false
-	c2BlueWant.AutonRankingPointByFoul = false
 	c2BlueWant.BonusRankingPoints = 1
 
 	return []workedExample{
@@ -117,7 +115,7 @@ var workedExamples = func() []workedExample {
 			},
 			blueWant: W{
 				LeavePoints: 4, AutoTreasurePoints: 4, AutonPoints: 8, TeleopTreasurePoints: 34, EndgamePoints: 2,
-				Crown: CrownTeleopFirst, CrownPoints: 10, TreasureCount: 7, ShelfTreasureCount: 4, MatchPoints: 44,
+				TreasureCount: 7, ShelfTreasureCount: 4, MatchPoints: 44,
 				FoulPoints: 5, Score: 49,
 			},
 			redRp: 4, blueRp: 0, status: RedWonMatch,
@@ -140,7 +138,7 @@ var workedExamples = func() []workedExample {
 			},
 			blueWant: W{
 				LeavePoints: 8, AutoTreasurePoints: 8, AutonPoints: 16, TeleopTreasurePoints: 93, EndgamePoints: 24,
-				TossPoints: 2, Crown: CrownTeleopTop, CrownPoints: 20, TreasureCount: 13, ShelfTreasureCount: 11,
+				TossPoints: 2, TreasureCount: 13, ShelfTreasureCount: 11,
 				MatchPoints: 135, Score: 135, EndgameRankingPoint: true, BonusRankingPoints: 1,
 			},
 			redRp: 2, blueRp: 4, status: BlueWonMatch,

@@ -135,12 +135,6 @@ const handleMatchTime = function (data) {
 // The text shown in the Endgame row for each game.EndgameStatus enum value.
 const endgameStatusLabels = ["None", "Park", "Balance"];
 
-// The location text shown in the Crown row for each game.CrownPlacement enum value. Index 0 (CrownNone) is handled
-// the same way as any other value here, since the crown's String() also reports "None" for it.
-const crownPlacementLabels = [
-  "-", "Auto Floor", "Auto First", "Auto Top", "Teleop Floor", "Teleop First", "Teleop Top", "Teleop Stacked",
-];
-
 // Updates the head-referee score summary rows for one alliance from its live score and summary.
 const updateScoreSummary = function (alliance, score, summary) {
   const prefix = `${alliance}ScoreSummary`;
@@ -153,9 +147,9 @@ const updateScoreSummary = function (alliance, score, summary) {
   $(`#${prefix}Teleop`).text(
     `${score.TeleopFloor}/${score.TeleopFirst}/${score.TeleopTop}/${score.TeleopStacked}`
   );
-  $(`#${prefix}Crown`).text(crownPlacementLabels[summary.Crown]);
+  $(`#${prefix}Crown`).text(crownPlacementLabels[score.Crown]);
   $(`#${prefix}Toss`).text(score.Toss ? "✔" : "✘");
-  $(`#${prefix}Shelf`).text(`${summary.ShelfTreasureCount}/${summary.ShelfTreasureGoal}`);
+  $(`#${prefix}ScoringRp`).text(`${summary.ShelfTreasureCount}/${summary.ShelfTreasureGoal}`);
 };
 
 // Handles a websocket message to update the realtime scoring fields.

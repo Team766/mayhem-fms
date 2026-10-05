@@ -33,6 +33,7 @@ type MatchReviewEditAlliance struct {
 	Teams             []int
 	Summary           *game.ScoreSummary
 	ShowRankingPoints bool
+	CrownSpots        []game.CrownSpot
 }
 
 type MatchReviewSummaryResponse struct {
@@ -122,12 +123,14 @@ func (web *Web) matchReviewEditGetHandler(w http.ResponseWriter, r *http.Request
 			Teams:             redTeams,
 			Summary:           matchResult.RedScoreSummary(),
 			ShowRankingPoints: match.Type != model.Playoff,
+			CrownSpots:        game.CrownSpots,
 		},
 		{
 			Alliance:          "blue",
 			Teams:             blueTeams,
 			Summary:           matchResult.BlueScoreSummary(),
 			ShowRankingPoints: match.Type != model.Playoff,
+			CrownSpots:        game.CrownSpots,
 		},
 	}
 	data := struct {

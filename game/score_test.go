@@ -79,8 +79,7 @@ func TestScoreSummarize(t *testing.T) {
 			},
 			nil,
 			W{
-				AutoTreasurePoints: 56, TeleopTreasurePoints: 149 + 20, TossPoints: 2, Crown: CrownTeleopTop,
-				CrownPoints: 20, TreasureCount: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 1, ShelfTreasureCount: 5 + 6 + 7 + 1,
+				AutoTreasurePoints: 56, TeleopTreasurePoints: 149 + 20, TossPoints: 2, TreasureCount: 1 + 2 + 3 + 4 + 5 + 6 + 7 + 1, ShelfTreasureCount: 5 + 6 + 7 + 1,
 				AutonRankingPoint: true, ScoringRankingPoint: true,
 			},
 		},
@@ -90,7 +89,7 @@ func TestScoreSummarize(t *testing.T) {
 			// 3 x 10 + 20: the other treasures are not doubled.
 			"crown with treasures in the same place", S{TeleopTop: 3, Crown: CrownTeleopTop}, nil,
 			W{
-				TeleopTreasurePoints: 50, Crown: CrownTeleopTop, CrownPoints: 20, TreasureCount: 4,
+				TeleopTreasurePoints: 50, TreasureCount: 4,
 				ShelfTreasureCount: 4,
 			},
 		},
@@ -103,8 +102,7 @@ func TestScoreSummarize(t *testing.T) {
 			},
 			minors(ma2616),
 			W{
-				LeavePoints: 8, TeleopTreasurePoints: 20, EndgamePoints: 12, TossPoints: 2, Crown: CrownTeleopTop,
-				CrownPoints: 20, TreasureCount: 1, ShelfTreasureCount: 1, FoulPoints: 5, EndgameRankingPoint: true,
+				LeavePoints: 8, TeleopTreasurePoints: 20, EndgamePoints: 12, TossPoints: 2, TreasureCount: 1, ShelfTreasureCount: 1, FoulPoints: 5, EndgameRankingPoint: true,
 			},
 		},
 
@@ -180,14 +178,13 @@ func TestScoreSummarize(t *testing.T) {
 		},
 		{
 			"auton from the opponent's MA2603", S{LeaveStatuses: [3]bool{true}}, majors(ma2603),
-			W{LeavePoints: 4, FoulPoints: 10, NumOpponentMajorFouls: 1, AutonRankingPoint: true, AutonRankingPointByFoul: true},
+			W{LeavePoints: 4, FoulPoints: 10, NumOpponentMajorFouls: 1, AutonRankingPoint: true},
 		},
 		{
 			"auton earned both ways is one ranking point", S{AutoTop: 2}, majors(ma2603),
 			W{
 				AutoTreasurePoints: 24, TreasureCount: 2, FoulPoints: 10, NumOpponentMajorFouls: 1,
-				AutonRankingPoint: true, AutonRankingPointByFoul: true,
-			},
+				AutonRankingPoint: true},
 		},
 
 		// Scoring RP: at least 12 teleop treasures on the first shelf, on the top shelf or stacked, counting the crown
@@ -224,17 +221,16 @@ func TestScoreSummarize(t *testing.T) {
 		// Endgame RP: at least one robot balanced, or the opponent committed MA2601 or MA2602.
 		{
 			"endgame from the opponent's MA2601", S{}, majors(ma2601),
-			W{FoulPoints: 10, NumOpponentMajorFouls: 1, EndgameRankingPoint: true, EndgameRankingPointByFoul: true},
+			W{FoulPoints: 10, NumOpponentMajorFouls: 1, EndgameRankingPoint: true},
 		},
 		{
 			"endgame from the opponent's MA2602", S{}, majors(ma2602),
-			W{FoulPoints: 10, NumOpponentMajorFouls: 1, EndgameRankingPoint: true, EndgameRankingPointByFoul: true},
+			W{FoulPoints: 10, NumOpponentMajorFouls: 1, EndgameRankingPoint: true},
 		},
 		{
 			"endgame earned both ways is one ranking point", S{EndgameStatuses: [3]EndgameStatus{balance}}, majors(ma2602),
 			W{
 				EndgamePoints: 12, FoulPoints: 10, NumOpponentMajorFouls: 1, EndgameRankingPoint: true,
-				EndgameRankingPointByFoul: true,
 			},
 		},
 		{
@@ -245,9 +241,7 @@ func TestScoreSummarize(t *testing.T) {
 		{
 			"ranking points from both opponent violations", S{}, majors(ma2603, ma2601),
 			W{
-				FoulPoints: 20, NumOpponentMajorFouls: 2, AutonRankingPoint: true, AutonRankingPointByFoul: true,
-				EndgameRankingPoint: true, EndgameRankingPointByFoul: true,
-			},
+				FoulPoints: 20, NumOpponentMajorFouls: 2, AutonRankingPoint: true, EndgameRankingPoint: true},
 		},
 		{
 			"all three bonus ranking points",
@@ -263,7 +257,7 @@ func TestScoreSummarize(t *testing.T) {
 			"test score 1", *TestScore1(), TestScore2().Fouls,
 			W{
 				LeavePoints: 8, AutoBalancePoints: 12, AutoTreasurePoints: 32, TeleopTreasurePoints: 64,
-				EndgamePoints: 14, TossPoints: 2, Crown: CrownTeleopTop, CrownPoints: 20, TreasureCount: 14,
+				EndgamePoints: 14, TossPoints: 2, TreasureCount: 14,
 				ShelfTreasureCount: 7, AutonRankingPoint: true, EndgameRankingPoint: true,
 			},
 		},
@@ -325,8 +319,9 @@ func TestScoreCrown(t *testing.T) {
 		t.Run(
 			testCase.crown.String(), func(t *testing.T) {
 				points := testCase.points
+				assert.Equal(t, points, testCase.crown.PointValue())
 				want := ScoreSummary{
-					TeleopTreasurePoints: 55, Crown: testCase.crown, CrownPoints: points, TreasureCount: 12,
+					TeleopTreasurePoints: 55, TreasureCount: 12,
 					ShelfTreasureCount: 11, ShelfTreasureGoal: 12,
 				}
 				if testCase.crown == CrownNone {
@@ -443,4 +438,23 @@ func TestScoreValidate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCrownSpots(t *testing.T) {
+	// Every placement except none appears exactly once, in enum order, with a unique panel id.
+	ids := map[string]bool{}
+	for i, spot := range CrownSpots {
+		assert.Equal(t, CrownPlacement(i+1), spot.Placement)
+		assert.False(t, ids[spot.Id], spot.Id)
+		ids[spot.Id] = true
+	}
+	assert.Equal(t, int(CrownTeleopStacked), len(CrownSpots))
+
+	assert.Equal(t, "None", CrownNone.String())
+	assert.Equal(t, "Auto Floor", CrownAutoFloor.String())
+	assert.Equal(t, "Teleop Top Shelf", CrownTeleopTop.String())
+	labels := CrownLabels()
+	assert.Equal(t, "-", labels[CrownNone])
+	assert.Equal(t, "Teleop Stacked", labels[CrownTeleopStacked])
+	assert.Equal(t, len(CrownSpots)+1, len(labels))
 }

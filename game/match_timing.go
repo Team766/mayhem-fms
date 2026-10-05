@@ -7,14 +7,12 @@ package game
 
 import "time"
 
-// TossRemainingDurationSec is the point in the match, given as seconds remaining, at which the human players may throw
-// their marked toss cube into the treasure chest. It is announced by the "toss" sound.
 var MatchTiming = struct {
 	AutoDurationSec             int
 	PauseDurationSec            int
 	TeleopDurationSec           int
 	WarningRemainingDurationSec int
-	TossRemainingDurationSec    int
+	TossRemainingDurationSec    int // Seconds left when the toss opens, announced by the "toss" sound.
 	TimeoutDurationSec          int
 }{15, 3, 120, 30, 20, 0}
 

@@ -90,26 +90,44 @@ func (placement CrownPlacement) IsAuto() bool {
 	return placement == CrownAutoFloor || placement == CrownAutoFirst || placement == CrownAutoTop
 }
 
-// Returns the name of the placement, for display.
+// CrownSpot is one place the crown can end up, as the screens show it.
+type CrownSpot struct {
+	Placement CrownPlacement
+	Id        string // The id the scoring panel sends, e.g. "teleop_top".
+	Phase     string // "Auto" or "Teleop".
+	Spot      string // "Floor", "First Shelf", "Top Shelf" or "Stacked".
+}
+
+// CrownSpots lists every place the crown can end up, in display order. The scoring panel, the edit-result form and
+// the referee panel read it instead of keeping their own copies.
+var CrownSpots = []CrownSpot{
+	{CrownAutoFloor, "auto_floor", "Auto", "Floor"},
+	{CrownAutoFirst, "auto_first", "Auto", "First Shelf"},
+	{CrownAutoTop, "auto_top", "Auto", "Top Shelf"},
+	{CrownTeleopFloor, "teleop_floor", "Teleop", "Floor"},
+	{CrownTeleopFirst, "teleop_first", "Teleop", "First Shelf"},
+	{CrownTeleopTop, "teleop_top", "Teleop", "Top Shelf"},
+	{CrownTeleopStacked, "teleop_stacked", "Teleop", "Stacked"},
+}
+
+// Returns the name of the placement, for display, e.g. "Teleop Top Shelf", or "None".
 func (placement CrownPlacement) String() string {
-	switch placement {
-	case CrownAutoFloor:
-		return "Auto Floor"
-	case CrownAutoFirst:
-		return "Auto First"
-	case CrownAutoTop:
-		return "Auto Top"
-	case CrownTeleopFloor:
-		return "Teleop Floor"
-	case CrownTeleopFirst:
-		return "Teleop First"
-	case CrownTeleopTop:
-		return "Teleop Top"
-	case CrownTeleopStacked:
-		return "Teleop Stacked"
-	default:
-		return "None"
+	for _, spot := range CrownSpots {
+		if spot.Placement == placement {
+			return spot.Phase + " " + spot.Spot
+		}
 	}
+	return "None"
+}
+
+// CrownLabels returns the display name of every placement, indexed by its value, with "-" for no crown. The referee
+// panel uses it to label the live crown placement.
+func CrownLabels() []string {
+	labels := []string{"-"}
+	for _, spot := range CrownSpots {
+		labels = append(labels, spot.Placement.String())
+	}
+	return labels
 }
 
 // Represents where a robot ended the match: nowhere in particular, parked in its own safe house, or balanced on its own
@@ -155,13 +173,12 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 
 	// The dragon's crown is worth twice an ordinary treasure in the same place. The treasure counters never include it,
 	// so its points are added to the period in which it was placed.
-	summary.Crown = score.Crown
-	summary.CrownPoints = score.Crown.PointValue()
+	crownPoints := score.Crown.PointValue()
 	if score.Crown.IsAuto() {
-		summary.AutoTreasurePoints += summary.CrownPoints
+		summary.AutoTreasurePoints += crownPoints
 	} else {
 		// CrownNone is worth zero, so adding it here is harmless.
-		summary.TeleopTreasurePoints += summary.CrownPoints
+		summary.TeleopTreasurePoints += crownPoints
 	}
 
 	summary.AutonPoints = summary.LeavePoints + summary.AutoBalancePoints + summary.AutoTreasurePoints
@@ -212,8 +229,7 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 
 	// Auton ranking point: at least the threshold in autonomous points, or the opponent entered the alliance's safe
 	// house or safe zone during auto (MA2603).
-	summary.AutonRankingPointByFoul = opponentScore.hasFoulForRule("MA2603")
-	summary.AutonRankingPoint = summary.AutonPoints >= AutonRpThreshold || summary.AutonRankingPointByFoul
+	summary.AutonRankingPoint = summary.AutonPoints >= AutonRpThreshold || opponentScore.hasFoulForRule("MA2603")
 
 	// Scoring ranking point: at least the threshold in treasures placed during teleop on the first shelf, on the top
 	// shelf, or stacked, counting the crown as one. There is no opponent-violation alternative.
@@ -221,8 +237,7 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 
 	// Endgame ranking point: at least one robot balanced on its mountain top, or the opponent contacted the alliance's
 	// balance beam (MA2601) or a robot on its own beam (MA2602) during endgame. Parking does not count.
-	summary.EndgameRankingPointByFoul = opponentScore.hasFoulForRule("MA2601", "MA2602")
-	summary.EndgameRankingPoint = numRobotsBalanced > 0 || summary.EndgameRankingPointByFoul
+	summary.EndgameRankingPoint = numRobotsBalanced > 0 || opponentScore.hasFoulForRule("MA2601", "MA2602")
 
 	// Add up the bonus ranking points.
 	if summary.AutonRankingPoint {

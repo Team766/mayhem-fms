@@ -144,7 +144,7 @@ html {
 }
 
 .score-number.score-stats {
-  width: 90px;
+  width: 130px; /* Fits "Scoring RP 12/12 ✔" on one line. */
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;

@@ -6,29 +6,25 @@
 package game
 
 type ScoreSummary struct {
-	LeavePoints               int
-	AutoBalancePoints         int
-	AutoTreasurePoints        int
-	AutonPoints               int
-	TeleopTreasurePoints      int
-	EndgamePoints             int
-	TossPoints                int
-	Crown                     CrownPlacement
-	CrownPoints               int
-	TreasureCount             int
-	ShelfTreasureCount        int
-	ShelfTreasureGoal         int
-	MatchPoints               int
-	FoulPoints                int
-	Score                     int
-	PlayoffDq                 bool
-	AutonRankingPoint         bool
-	ScoringRankingPoint       bool
-	EndgameRankingPoint       bool
-	AutonRankingPointByFoul   bool
-	EndgameRankingPointByFoul bool
-	BonusRankingPoints        int
-	NumOpponentMajorFouls     int
+	LeavePoints           int
+	AutoBalancePoints     int
+	AutoTreasurePoints    int
+	AutonPoints           int
+	TeleopTreasurePoints  int
+	EndgamePoints         int
+	TossPoints            int
+	TreasureCount         int
+	ShelfTreasureCount    int
+	ShelfTreasureGoal     int
+	MatchPoints           int
+	FoulPoints            int
+	Score                 int
+	PlayoffDq             bool
+	AutonRankingPoint     bool
+	ScoringRankingPoint   bool
+	EndgameRankingPoint   bool
+	BonusRankingPoints    int
+	NumOpponentMajorFouls int
 }
 
 type MatchStatus int
