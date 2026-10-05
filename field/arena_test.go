@@ -92,8 +92,6 @@ func TestArenaCheckCanStartMatch(t *testing.T) {
 	arena.Plc = &plc
 	// The M-Ayhem field has no FTA ready switch, so that input never blocks a match start.
 	assert.Nil(t, arena.checkCanStartMatch())
-	plc.ftaReady = true
-	assert.Nil(t, arena.checkCanStartMatch())
 }
 
 func TestArenaMatchFlow(t *testing.T) {
