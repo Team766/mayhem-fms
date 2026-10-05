@@ -90,7 +90,7 @@ func TestScoringPanelWebsocket(t *testing.T) {
 			func(s *game.Score) bool { return s.AutoTop == 0 },
 		},
 		{"unknown counter", "treasure", m{"Counter": "nonexistent", "Adjustment": 1}, nil},
-		{"crown", "crown", m{"Value": "teleop_top"}, func(s *game.Score) bool { return s.Crown == game.CrownTeleopTop }},
+		{"unknown crown spot", "crown", m{"Value": "moat"}, nil},
 		{"leave on", "leave", m{"TeamPosition": 1}, func(s *game.Score) bool { return s.LeaveStatuses[0] }},
 		{"leave toggles off", "leave", m{"TeamPosition": 1}, func(s *game.Score) bool { return !s.LeaveStatuses[0] }},
 		// Balancing in auto also sets Leave, since the robot had to leave its safe house to reach the beam.
@@ -112,8 +112,35 @@ func TestScoringPanelWebsocket(t *testing.T) {
 			func(s *game.Score) bool { return s.EndgameStatuses[2] == game.EndgameBalance },
 		},
 		{"no station 4", "leave", m{"TeamPosition": 4}, nil},
-		{"endgame value out of range", "endgame", m{"TeamPosition": 1, "Value": 3}, nil},
+		{"endgame value above range", "endgame", m{"TeamPosition": 1, "Value": 3}, nil},
+		{"endgame value below range", "endgame", m{"TeamPosition": 1, "Value": -1}, nil},
 		{"toss", "toss", nil, func(s *game.Score) bool { return s.Toss }},
+	}
+	// Each counter id adds to its own field.
+	for id, field := range map[string]func(s *game.Score) int{
+		"auto_floor":     func(s *game.Score) int { return s.AutoFloor },
+		"auto_first":     func(s *game.Score) int { return s.AutoFirst },
+		"auto_top":       func(s *game.Score) int { return s.AutoTop },
+		"teleop_floor":   func(s *game.Score) int { return s.TeleopFloor },
+		"teleop_first":   func(s *game.Score) int { return s.TeleopFirst },
+		"teleop_top":     func(s *game.Score) int { return s.TeleopTop },
+		"teleop_stacked": func(s *game.Score) int { return s.TeleopStacked },
+	} {
+		steps = append(steps, struct {
+			name    string
+			command string
+			data    any
+			check   check
+		}{"treasure " + id, "treasure", m{"Counter": id, "Adjustment": 2}, func(s *game.Score) bool { return field(s) == 2 }})
+	}
+	// Each crown spot sets its placement, and "none" clears it.
+	for _, spot := range append(game.CrownSpots, game.CrownSpot{Placement: game.CrownNone, Id: "none"}) {
+		steps = append(steps, struct {
+			name    string
+			command string
+			data    any
+			check   check
+		}{"crown " + spot.Id, "crown", m{"Value": spot.Id}, func(s *game.Score) bool { return s.Crown == spot.Placement }})
 	}
 	for _, step := range steps {
 		sender := redFarWs
@@ -176,12 +203,19 @@ func TestScoringPanelWebsocketRejectsThirdRobotInTwoVsTwoMode(t *testing.T) {
 	redFarWs := dialScoringPanel(t, wsUrl, "red_far")
 	readInitialScoringPanelMessages(t, redFarWs)
 
-	// Station 3 is not in play in 2v2 mode, so the command should be silently rejected.
-	redFarWs.Write("leave", struct{ TeamPosition int }{3})
-	redFarWs.Write("leave", struct{ TeamPosition int }{1})
-	readWebsocketType(t, redFarWs, "realtimeScore")
-	assert.False(t, web.arena.RedRealtimeScore.CurrentScore.LeaveStatuses[2])
-	assert.True(t, web.arena.RedRealtimeScore.CurrentScore.LeaveStatuses[0])
+	// Station 3 is not in play in 2v2 mode, so each per-robot command for it should be silently rejected. A valid
+	// command follows so there is a notification to wait for.
+	type m = map[string]any
+	for _, command := range []string{"leave", "auto_balance", "endgame"} {
+		redFarWs.Write(command, m{"TeamPosition": 3, "Value": int(game.EndgamePark)})
+		redFarWs.Write("toss", nil)
+		readWebsocketType(t, redFarWs, "realtimeScore")
+	}
+	score := web.arena.RedRealtimeScore.CurrentScore
+	assert.False(t, score.LeaveStatuses[2])
+	assert.False(t, score.AutoBalanceStatuses[2])
+	assert.Equal(t, game.EndgameNone, score.EndgameStatuses[2])
+	assert.True(t, score.Toss)
 }
 
 func dialScoringPanel(t *testing.T, wsUrl, position string) *websocket.Websocket {

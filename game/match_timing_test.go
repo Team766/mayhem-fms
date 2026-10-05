@@ -1,10 +1,12 @@
+// Copyright 2020 Team 254. All Rights Reserved.
+// Author: pat@patfairbank.com (Patrick Fairbank)
+
 package game
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMatchTimingDefaults(t *testing.T) {
