@@ -1,0 +1,128 @@
+# Medieval Mayhem, the M-Ayhem 2026 game.
+# This file always holds the current year's game; earlier games are in git history.
+# Format: docs/agents/game-spec-format.md.
+
+game_pieces:
+  - id: treasure
+    display_name: "Treasure"
+  - id: crown
+    display_name: "Crown"
+  - id: toss_treasure
+    display_name: "Toss Treasure"
+
+# Totals shown on the audience screens. A group adds up its elements' points and counts their game pieces; a status
+# in a group counts as one piece when it isn't none. An element with no group, like the toss, is shown on its own.
+scoring_groups:
+  - id: treasure
+    display_name: "Treasure"
+
+# Counters, one set per alliance.
+scoring_counts:
+  - id: floor
+    display_name: "Floor"
+    game_piece: treasure
+    scoring_group: treasure
+    scorer: near
+    phases:
+      - { phase: auto, points: 4 }
+      - { phase: teleop, points: 2 }
+
+  - id: first_shelf
+    display_name: "First Shelf"
+    game_piece: treasure
+    scoring_group: treasure
+    scorer: near
+    phases:
+      - { phase: auto, points: 8 }
+      - { phase: teleop, points: 5 }
+
+  - id: top_shelf
+    display_name: "Top Shelf"
+    game_piece: treasure
+    scoring_group: treasure
+    scorer: near
+    phases:
+      - { phase: auto, points: 12 }
+      - { phase: teleop, points: 10 }
+
+  - id: stacked
+    display_name: "Stacked"
+    game_piece: treasure
+    scoring_group: treasure
+    scorer: near
+    phases:
+      - { phase: teleop, points: 8 }
+
+# Statuses. With `points` a status is yes or no. With `values` it is one of the values, or none (0 points).
+statuses:
+  - id: leave
+    display_name: "Leave"
+    per: robot
+    scorer: far
+    phases:
+      - { phase: auto, points: 4 }
+
+  - id: auto_balance
+    display_name: "Auto Balance"
+    per: robot
+    scorer: far
+    phases:
+      - { phase: auto, points: 12 }
+
+  - id: crown
+    display_name: "Crown"
+    game_piece: crown
+    scoring_group: treasure
+    per: alliance
+    scorer: far
+    phases:                     # one value across both phases
+      - { phase: auto, values: { floor: 8, first_shelf: 16, top_shelf: 24 } }
+      - { phase: teleop, values: { floor: 4, first_shelf: 10, top_shelf: 20, stacked: 16 } }
+
+  - id: endgame
+    display_name: "Endgame"
+    per: robot
+    scorer: far
+    phases:
+      - { phase: endgame, values: { park: 2, balance: 12 } }
+
+  - id: toss
+    display_name: "Toss"
+    game_piece: toss_treasure
+    per: alliance
+    scorer: far
+    phases:
+      - { phase: endgame, points: 2 }
+
+# 1 RP each, in qualification matches. Thresholds are the same in 2v2 and 3v3.
+# opponent_fouls: the other alliance committing any of these fouls also earns the RP.
+bonus_ranking_points:
+  - id: auton
+    display_name: "Auton"
+    threshold: 20
+    earned_when: Auto points are at least the threshold.
+    opponent_fouls: [MA2603]
+
+  - id: scoring
+    display_name: "Scoring"
+    threshold: 12
+    earned_when: >
+      The number of treasures scored in teleop on the first shelf, top shelf or stacked is at least the threshold.
+      The crown counts as one treasure for this RP.
+
+  - id: endgame
+    display_name: "Endgame"
+    earned_when: At least one of the alliance's robots is balanced at the end.
+    opponent_fouls: [MA2601, MA2602]
+
+# After ranking points. Each is an average per match.
+ranking_tiebreakers:
+  - metric: total_points        # includes foul points
+  - metric: auto_points
+  - metric: random
+
+# For a tied playoff match, in order.
+playoff_tiebreakers:
+  - metric: major_fouls_committed   # fewer wins
+  - metric: auto_points
+  - metric: points_without_fouls
