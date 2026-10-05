@@ -276,7 +276,7 @@ func TestWorkedExampleRankings(t *testing.T) {
 	}
 	sort.Sort(rankings)
 
-	// The table from the spec: team, ranking points, score, then auton points.
+	// The expected order: team, ranking points, score, then auton points.
 	expectedRankings := [][4]int{
 		{107, 4, 135, 16}, {108, 4, 135, 16}, {109, 4, 95, 24}, {110, 4, 95, 24}, {101, 4, 86, 16}, {102, 4, 86, 16},
 		{105, 2, 112, 20}, {106, 2, 112, 20}, {111, 2, 57, 4}, {112, 2, 57, 4}, {103, 0, 49, 8}, {104, 0, 49, 8},

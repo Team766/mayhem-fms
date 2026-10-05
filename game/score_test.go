@@ -419,16 +419,27 @@ func TestScoreEquals(t *testing.T) {
 }
 
 func TestScoreValidate(t *testing.T) {
-	assert.Nil(t, TestScore1().Validate())
+	// The highest legal values pass.
+	valid := TestScore1()
+	valid.Crown = CrownTeleopStacked
+	valid.EndgameStatuses = [3]EndgameStatus{EndgameNone, EndgamePark, EndgameBalance}
+	assert.Nil(t, valid.Validate())
+
 	for _, testCase := range []struct {
 		name    string
 		score   Score
 		message string
 	}{
-		{"negative auto counter", Score{AutoFirst: -1}, "AutoFirst can't be negative"},
-		{"negative teleop counter", Score{TeleopStacked: -2}, "TeleopStacked can't be negative"},
+		{"negative AutoFloor", Score{AutoFloor: -1}, "AutoFloor can't be negative"},
+		{"negative AutoFirst", Score{AutoFirst: -1}, "AutoFirst can't be negative"},
+		{"negative AutoTop", Score{AutoTop: -1}, "AutoTop can't be negative"},
+		{"negative TeleopFloor", Score{TeleopFloor: -1}, "TeleopFloor can't be negative"},
+		{"negative TeleopFirst", Score{TeleopFirst: -1}, "TeleopFirst can't be negative"},
+		{"negative TeleopTop", Score{TeleopTop: -1}, "TeleopTop can't be negative"},
+		{"negative TeleopStacked", Score{TeleopStacked: -2}, "TeleopStacked can't be negative"},
 		{"crown below range", Score{Crown: -1}, "invalid crown placement -1"},
 		{"crown above range", Score{Crown: CrownTeleopStacked + 1}, "invalid crown placement 8"},
+		{"endgame below range", Score{EndgameStatuses: [3]EndgameStatus{-1, 0, 0}}, "invalid endgame status -1 for robot 1"},
 		{"endgame above range", Score{EndgameStatuses: [3]EndgameStatus{0, 0, EndgameBalance + 1}}, "robot 3"},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -441,20 +452,28 @@ func TestScoreValidate(t *testing.T) {
 }
 
 func TestCrownSpots(t *testing.T) {
-	// Every placement except none appears exactly once, in enum order, with a unique panel id.
-	ids := map[string]bool{}
-	for i, spot := range CrownSpots {
-		assert.Equal(t, CrownPlacement(i+1), spot.Placement)
-		assert.False(t, ids[spot.Id], spot.Id)
-		ids[spot.Id] = true
+	// One entry per placement except none, in enum order; CrownLabels is indexed by placement value.
+	labels := CrownLabels()
+	assert.Equal(t, "None", CrownNone.String())
+	assert.Equal(t, "-", labels[CrownNone])
+	for i, testCase := range []struct {
+		placement CrownPlacement
+		id        string
+		name      string
+	}{
+		{CrownAutoFloor, "auto_floor", "Auto Floor"},
+		{CrownAutoFirst, "auto_first", "Auto First Shelf"},
+		{CrownAutoTop, "auto_top", "Auto Top Shelf"},
+		{CrownTeleopFloor, "teleop_floor", "Teleop Floor"},
+		{CrownTeleopFirst, "teleop_first", "Teleop First Shelf"},
+		{CrownTeleopTop, "teleop_top", "Teleop Top Shelf"},
+		{CrownTeleopStacked, "teleop_stacked", "Teleop Stacked"},
+	} {
+		assert.Equal(t, testCase.placement, CrownSpots[i].Placement)
+		assert.Equal(t, testCase.id, CrownSpots[i].Id)
+		assert.Equal(t, testCase.name, testCase.placement.String())
+		assert.Equal(t, testCase.name, labels[testCase.placement])
 	}
 	assert.Equal(t, int(CrownTeleopStacked), len(CrownSpots))
-
-	assert.Equal(t, "None", CrownNone.String())
-	assert.Equal(t, "Auto Floor", CrownAutoFloor.String())
-	assert.Equal(t, "Teleop Top Shelf", CrownTeleopTop.String())
-	labels := CrownLabels()
-	assert.Equal(t, "-", labels[CrownNone])
-	assert.Equal(t, "Teleop Stacked", labels[CrownTeleopStacked])
 	assert.Equal(t, len(CrownSpots)+1, len(labels))
 }

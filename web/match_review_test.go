@@ -131,6 +131,10 @@ func TestMatchReviewEditExistingResult(t *testing.T) {
 	assert.Contains(t, recorder.Body.String(), `id="blueScore"`)
 	assert.Contains(t, recorder.Body.String(), `id="redSummary"`)
 	assert.Contains(t, recorder.Body.String(), `id="blueSummary"`)
+	// The crown dropdown lists every spot from game.CrownSpots.
+	for _, spot := range game.CrownSpots {
+		assert.Contains(t, recorder.Body.String(), fmt.Sprintf(`<option value="%d">%s</option>`, spot.Placement, spot.Placement))
+	}
 	assert.Contains(t, recorder.Body.String(), "score-summary-table-red")
 	assert.Contains(t, recorder.Body.String(), "score-summary-table-blue")
 	assert.NotContains(t, recorder.Body.String(), "score-summary-rp")
@@ -381,19 +385,23 @@ func TestMatchReviewEditRejectsImpossibleScores(t *testing.T) {
 	assert.Nil(t, web.arena.Database.CreateMatchResult(matchResult))
 
 	for _, testCase := range []struct {
-		name     string
-		redScore string
-		message  string
+		name      string
+		redScore  string
+		blueScore string
+		message   string
 	}{
-		{"negative counter", `{"TeleopTop":-1}`, "TeleopTop can't be negative"},
-		{"unknown crown", `{"Crown":9}`, "invalid crown placement 9"},
-		{"unknown endgame", `{"EndgameStatuses":[0,5,0]}`, "invalid endgame status 5 for robot 2"},
+		{"negative counter", `{"TeleopTop":-1}`, `{}`, "Red score: TeleopTop can't be negative"},
+		{"unknown crown", `{"Crown":9}`, `{}`, "Red score: invalid crown placement 9"},
+		{"unknown endgame", `{"EndgameStatuses":[0,5,0]}`, `{}`, "Red score: invalid endgame status 5 for robot 2"},
+		{"blue negative counter", `{}`, `{"AutoFloor":-3}`, "Blue score: AutoFloor can't be negative"},
+		{"blue unknown crown", `{}`, `{"Crown":-1}`, "Blue score: invalid crown placement -1"},
 	} {
 		t.Run(testCase.name, func(t *testing.T) {
 			postBody := fmt.Sprintf(
-				`matchResultJson={"MatchId":%d,"RedScore":%s,"BlueScore":{},"RedCards":{},"BlueCards":{}}`,
+				`matchResultJson={"MatchId":%d,"RedScore":%s,"BlueScore":%s,"RedCards":{},"BlueCards":{}}`,
 				match.Id,
 				testCase.redScore,
+				testCase.blueScore,
 			)
 			recorder := web.postHttpResponse(fmt.Sprintf("/match_review/%d/edit", match.Id), postBody)
 			assert.Equal(t, 500, recorder.Code)
