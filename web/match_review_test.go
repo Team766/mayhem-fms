@@ -276,7 +276,7 @@ func TestMatchReviewEditCurrentMatch(t *testing.T) {
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), " Qualification 352 ")
 	assert.Contains(t, recorder.Body.String(), "score-summary-rp")
-	assert.Contains(t, recorder.Body.String(), "Ranking Points")
+	assert.Contains(t, recorder.Body.String(), "Bonus RPs")
 
 	postBody := fmt.Sprintf(
 		"matchResultJson={\"MatchId\":%d,\"RedScore\":{},\"BlueScore\":{"+
