@@ -163,6 +163,11 @@ func (web *Web) scheduleSavePostHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	if len(cachedMatches[matchType]) == 0 {
+		web.renderSchedule(w, r, "There is no schedule to save. Generate the schedule first.")
+		return
+	}
+
 	for _, match := range cachedMatches[matchType] {
 		err = web.arena.Database.CreateMatch(&match)
 		if err != nil {
@@ -262,4 +267,10 @@ func getMatchType(r *http.Request) string {
 		return matchType[0]
 	}
 	return r.PostFormValue("matchType")
+}
+
+// Discards any generated but unsaved schedules.
+func clearSchedulePreviews() {
+	cachedMatches = make(map[model.MatchType][]model.Match)
+	cachedTeamFirstMatches = make(map[model.MatchType]map[int]string)
 }

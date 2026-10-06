@@ -624,3 +624,25 @@ func readWebsocketTypeEventually(
 ) any {
 	return readWebsocketTypes(t, ws, maxMessages, expectedMessageType)[expectedMessageType]
 }
+
+func TestMatchPlayReloadsOnModeChange(t *testing.T) {
+	web := setupTestWeb(t)
+	server, wsUrl := web.startTestServer()
+	defer server.Close()
+	conn, _, err := gorillawebsocket.DefaultDialer.Dial(wsUrl+"/match_play/websocket", nil)
+	assert.Nil(t, err)
+	defer conn.Close()
+	ws := websocket.NewTestWebsocket(conn)
+	for _, messageType := range []string{"matchTiming", "allianceStationDisplayMode", "arenaStatus",
+		"audienceDisplayMode", "eventStatus", "matchLoad", "matchTime", "realtimeScore", "scorePosted",
+		"scoringStatus"} {
+		readWebsocketType(t, ws, messageType)
+	}
+
+	// Match Play lays out its stations when it loads, so switching modes in either direction reloads it.
+	for _, settings := range []string{"name=Mode Change&twoVsTwoMode=on", "name=Mode Change"} {
+		recorder := web.postHttpResponse("/setup/settings", settings)
+		assert.Equal(t, 303, recorder.Code)
+		readWebsocketTypeEventually(t, ws, "reload", 10)
+	}
+}

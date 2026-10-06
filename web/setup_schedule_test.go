@@ -4,6 +4,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/Team254/cheesy-arena/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -145,4 +146,44 @@ func TestSetupScheduleErrors(t *testing.T) {
 	recorder = web.postHttpResponse("/setup/schedule/save", postData)
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), "schedule of 2 Practice matches already exists")
+}
+
+func TestSetupScheduleModeChangeDiscardsPreview(t *testing.T) {
+	// A preview generated in one mode must not be saved after switching modes: 3v3 matches can't load in 2v2 mode,
+	// and 2v2 matches would leave the third stations empty in 3v3 mode.
+	for _, testCase := range []struct {
+		startInTwoVsTwo bool
+		numMatches      int
+	}{
+		{false, 19},
+		{true, 28},
+	} {
+		web := setupTestWeb(t)
+		web.arena.EventSettings.TwoVsTwoMode = testCase.startInTwoVsTwo
+		for i := 0; i < 14; i++ {
+			web.arena.Database.CreateTeam(&model.Team{Id: i + 1})
+		}
+		postData := fmt.Sprintf(
+			"numScheduleBlocks=1&startTime0=2014-01-01 09:00:00 AM&numMatches0=%d&matchSpacingSec0=480&"+
+				"matchType=qualification",
+			testCase.numMatches,
+		)
+		recorder := web.postHttpResponse("/setup/schedule/generate", postData)
+		assert.Equal(t, 303, recorder.Code)
+
+		settings := "name=Mode Change"
+		if !testCase.startInTwoVsTwo {
+			settings += "&twoVsTwoMode=on"
+		}
+		recorder = web.postHttpResponse("/setup/settings", settings)
+		assert.Equal(t, 303, recorder.Code)
+		assert.Equal(t, !testCase.startInTwoVsTwo, web.arena.EventSettings.TwoVsTwoMode)
+
+		recorder = web.postHttpResponse("/setup/schedule/save?matchType=qualification", "")
+		assert.Equal(t, 200, recorder.Code)
+		assert.Contains(t, recorder.Body.String(), "There is no schedule to save. Generate the schedule first.")
+		matches, err := web.arena.Database.GetMatchesByType(model.Qualification, true)
+		assert.Nil(t, err)
+		assert.Empty(t, matches)
+	}
 }

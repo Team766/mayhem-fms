@@ -113,6 +113,7 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 	eventSettings.SelectionRound3Order = r.PostFormValue("selectionRound3Order")
 	eventSettings.SelectionShowUnpickedTeams = r.PostFormValue("selectionShowUnpickedTeams") == "on"
 
+	previousTwoVsTwoMode := eventSettings.TwoVsTwoMode
 	requestedTwoVsTwoMode := r.PostFormValue("twoVsTwoMode") == "on"
 	twoVsTwoModeLocked, err := web.twoVsTwoModeLocked()
 	if err != nil {
@@ -194,6 +195,13 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handleWebErr(w, err)
 		return
+	}
+
+	if eventSettings.TwoVsTwoMode != previousTwoVsTwoMode {
+		// A schedule preview made in the other mode would save matches the arena can't load.
+		clearSchedulePreviews()
+		// Open pages lay out their stations when they load, so reload them in the new mode.
+		web.arena.ReloadDisplaysNotifier.Notify()
 	}
 
 	if eventSettings.AdminPassword != previousAdminPassword {
