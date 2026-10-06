@@ -25,6 +25,21 @@ func TestMatchPlay(t *testing.T) {
 	assert.Contains(t, recorder.Body.String(), "Are you sure you want to discard the results for this match?")
 }
 
+func TestMatchPlayTwoVsTwo(t *testing.T) {
+	web := setupTestWeb(t)
+
+	recorder := web.getHttpResponse("/match_play")
+	assert.Equal(t, 200, recorder.Code)
+	assert.Contains(t, recorder.Body.String(), "statusR3")
+	assert.Contains(t, recorder.Body.String(), "statusB3")
+
+	web.arena.EventSettings.TwoVsTwoMode = true
+	recorder = web.getHttpResponse("/match_play")
+	assert.Equal(t, 200, recorder.Code)
+	assert.NotContains(t, recorder.Body.String(), "statusR3")
+	assert.NotContains(t, recorder.Body.String(), "statusB3")
+}
+
 func TestMatchPlayMatchList(t *testing.T) {
 	web := setupTestWeb(t)
 
@@ -608,4 +623,26 @@ func readWebsocketTypeEventually(
 	maxMessages int,
 ) any {
 	return readWebsocketTypes(t, ws, maxMessages, expectedMessageType)[expectedMessageType]
+}
+
+func TestMatchPlayReloadsOnModeChange(t *testing.T) {
+	web := setupTestWeb(t)
+	server, wsUrl := web.startTestServer()
+	defer server.Close()
+	conn, _, err := gorillawebsocket.DefaultDialer.Dial(wsUrl+"/match_play/websocket", nil)
+	assert.Nil(t, err)
+	defer conn.Close()
+	ws := websocket.NewTestWebsocket(conn)
+	for _, messageType := range []string{"matchTiming", "allianceStationDisplayMode", "arenaStatus",
+		"audienceDisplayMode", "eventStatus", "matchLoad", "matchTime", "realtimeScore", "scorePosted",
+		"scoringStatus"} {
+		readWebsocketType(t, ws, messageType)
+	}
+
+	// Match Play lays out its stations when it loads, so switching modes in either direction reloads it.
+	for _, settings := range []string{"name=Mode Change&twoVsTwoMode=on", "name=Mode Change"} {
+		recorder := web.postHttpResponse("/setup/settings", settings)
+		assert.Equal(t, 303, recorder.Code)
+		readWebsocketTypeEventually(t, ws, "reload", 10)
+	}
 }

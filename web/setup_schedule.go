@@ -81,16 +81,25 @@ func (web *Web) scheduleGeneratePostHandler(w http.ResponseWriter, r *http.Reque
 		)
 		return
 	}
-	if len(teams) < 6 {
+	minTeams := tournament.TeamsPerMatch
+	if web.arena.EventSettings.TwoVsTwoMode {
+		minTeams = tournament.TeamsPerMatch2v2
+	}
+	if len(teams) < minTeams {
 		web.renderSchedule(
 			w,
 			r,
-			fmt.Sprintf("There are only %d teams. There must be at least 6 teams to generate a schedule.", len(teams)),
+			fmt.Sprintf(
+				"There are only %d teams. There must be at least %d teams to generate a schedule.",
+				len(teams), minTeams,
+			),
 		)
 		return
 	}
 
-	matches, err := tournament.BuildRandomSchedule(teams, scheduleBlocks, matchType)
+	matches, err := tournament.BuildRandomSchedule(
+		teams, scheduleBlocks, matchType, web.arena.EventSettings.TwoVsTwoMode,
+	)
 	if err != nil {
 		web.renderSchedule(w, r, fmt.Sprintf("Error generating schedule: %s.", err.Error()))
 		return
@@ -101,6 +110,10 @@ func (web *Web) scheduleGeneratePostHandler(w http.ResponseWriter, r *http.Reque
 	teamFirstMatches := make(map[int]string)
 	for _, match := range matches {
 		checkTeam := func(team int) {
+			if team == 0 {
+				// An empty slot (e.g. a 2v2 match's unused third station) is not a team.
+				return
+			}
 			_, ok := teamFirstMatches[team]
 			if !ok {
 				teamFirstMatches[team] = match.ShortName
@@ -147,6 +160,11 @@ func (web *Web) scheduleSavePostHandler(w http.ResponseWriter, r *http.Request) 
 				matchType,
 			),
 		)
+		return
+	}
+
+	if len(cachedMatches[matchType]) == 0 {
+		web.renderSchedule(w, r, "There is no schedule to save. Generate the schedule first.")
 		return
 	}
 
@@ -249,4 +267,10 @@ func getMatchType(r *http.Request) string {
 		return matchType[0]
 	}
 	return r.PostFormValue("matchType")
+}
+
+// Discards any generated but unsaved schedules.
+func clearSchedulePreviews() {
+	cachedMatches = make(map[model.MatchType][]model.Match)
+	cachedTeamFirstMatches = make(map[model.MatchType]map[int]string)
 }

@@ -112,6 +112,25 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 	eventSettings.SelectionRound2Order = r.PostFormValue("selectionRound2Order")
 	eventSettings.SelectionRound3Order = r.PostFormValue("selectionRound3Order")
 	eventSettings.SelectionShowUnpickedTeams = r.PostFormValue("selectionShowUnpickedTeams") == "on"
+
+	previousTwoVsTwoMode := eventSettings.TwoVsTwoMode
+	requestedTwoVsTwoMode := r.PostFormValue("twoVsTwoMode") == "on"
+	twoVsTwoModeLocked, err := web.twoVsTwoModeLocked()
+	if err != nil {
+		handleWebErr(w, err)
+		return
+	}
+	if twoVsTwoModeLocked && requestedTwoVsTwoMode != eventSettings.TwoVsTwoMode {
+		web.renderSettingsWithStatus(
+			w, r,
+			"The 2v2 setting can't be changed once the qualification schedule exists. Clear the qualification "+
+				"schedule first to change it.",
+			activeSettingsTab, http.StatusOK,
+		)
+		return
+	}
+	eventSettings.TwoVsTwoMode = requestedTwoVsTwoMode
+
 	eventSettings.EventCode = r.PostFormValue("eventCode")
 	eventSettings.AutoAudienceDisplayEnabled = r.PostFormValue("autoAudienceDisplayEnabled") == "on"
 	eventSettings.NetworkSecurityEnabled = r.PostFormValue("networkSecurityEnabled") == "on"
@@ -165,7 +184,7 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 	eventSettings.TeleopDurationSec, _ = strconv.Atoi(r.PostFormValue("teleopDurationSec"))
 	eventSettings.WarningRemainingDurationSec, _ = strconv.Atoi(r.PostFormValue("warningRemainingDurationSec"))
 
-	err := web.arena.Database.UpdateEventSettings(eventSettings)
+	err = web.arena.Database.UpdateEventSettings(eventSettings)
 	if err != nil {
 		handleWebErr(w, err)
 		return
@@ -176,6 +195,13 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handleWebErr(w, err)
 		return
+	}
+
+	if eventSettings.TwoVsTwoMode != previousTwoVsTwoMode {
+		// A schedule preview made in the other mode would save matches the arena can't load.
+		clearSchedulePreviews()
+		// Open pages lay out their stations when they load, so reload them in the new mode.
+		web.arena.ReloadDisplaysNotifier.Notify()
 	}
 
 	if eventSettings.AdminPassword != previousAdminPassword {
@@ -191,6 +217,16 @@ func (web *Web) settingsPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func settingsSaveAllowed(matchState field.MatchState) bool {
 	return matchState == field.PreMatch || matchState == field.TimeoutActive || matchState == field.PostTimeout
+}
+
+// Returns true if the 2v2 setting can no longer be changed because the qualification schedule (or anything that
+// comes after it, such as alliance selection or playoffs) already exists.
+func (web *Web) twoVsTwoModeLocked() (bool, error) {
+	qualificationMatches, err := web.arena.Database.GetMatchesByType(model.Qualification, true)
+	if err != nil {
+		return false, err
+	}
+	return len(qualificationMatches) > 0, nil
 }
 
 func settingsTabFromRequest(r *http.Request) string {
@@ -368,11 +404,17 @@ func (web *Web) renderSettingsWithStatus(
 		handleWebErr(w, err)
 		return
 	}
+	twoVsTwoModeLocked, err := web.twoVsTwoModeLocked()
+	if err != nil {
+		handleWebErr(w, err)
+		return
+	}
 	data := struct {
 		*model.EventSettings
-		ErrorMessage      string
-		ActiveSettingsTab string
-	}{web.arena.EventSettings, errorMessage, activeSettingsTab}
+		ErrorMessage       string
+		ActiveSettingsTab  string
+		TwoVsTwoModeLocked bool
+	}{web.arena.EventSettings, errorMessage, activeSettingsTab, twoVsTwoModeLocked}
 	if statusCode != http.StatusOK {
 		w.WriteHeader(statusCode)
 	}

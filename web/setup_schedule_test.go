@@ -4,6 +4,7 @@
 package web
 
 import (
+	"fmt"
 	"github.com/Team254/cheesy-arena/model"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -44,6 +45,57 @@ func TestSetupSchedule(t *testing.T) {
 	assert.Equal(t, time.Date(2014, 1, 1, 9, 0, 0, 0, location).Unix(), matches[0].Time.Unix())
 	assert.Equal(t, time.Date(2014, 1, 2, 9, 56, 0, 0, location).Unix(), matches[7].Time.Unix())
 	assert.Equal(t, time.Date(2014, 1, 3, 13, 0, 0, 0, location).Unix(), matches[24].Time.Unix())
+}
+
+func TestSetupScheduleTwoVsTwo(t *testing.T) {
+	web := setupTestWeb(t)
+	web.arena.EventSettings.TwoVsTwoMode = true
+
+	for i := 0; i < 14; i++ {
+		web.arena.Database.CreateTeam(&model.Team{Id: i + 1})
+	}
+
+	postData := "numScheduleBlocks=1&startTime0=2014-01-01 09:00:00 AM&numMatches0=28&matchSpacingSec0=480&" +
+		"matchType=qualification"
+	recorder := web.postHttpResponse("/setup/schedule/generate", postData)
+	assert.Equal(t, 303, recorder.Code)
+
+	recorder = web.getHttpResponse("/setup/schedule?matchType=qualification")
+	assert.Equal(t, 200, recorder.Code)
+	// No stray "Team 0" first-match row for the always-empty third slot.
+	assert.NotContains(t, recorder.Body.String(), "<td>0</td>")
+
+	recorder = web.postHttpResponse("/setup/schedule/save?matchType=qualification", "")
+	assert.Equal(t, 303, recorder.Code)
+	matches, err := web.arena.Database.GetMatchesByType(model.Qualification, true)
+	assert.Nil(t, err)
+	if assert.Equal(t, 28, len(matches)) {
+		for _, match := range matches {
+			assert.Equal(t, 0, match.Red3)
+			assert.Equal(t, 0, match.Blue3)
+			assert.NotZero(t, match.Red1)
+			assert.NotZero(t, match.Red2)
+			assert.NotZero(t, match.Blue1)
+			assert.NotZero(t, match.Blue2)
+		}
+	}
+}
+
+func TestSetupScheduleTeamsPerMatch(t *testing.T) {
+	testCases := []struct {
+		twoVsTwoMode bool
+		expected     string
+	}{
+		{false, "var teamsPerMatch = 6;"},
+		{true, "var teamsPerMatch = 4;"},
+	}
+	for _, testCase := range testCases {
+		web := setupTestWeb(t)
+		web.arena.EventSettings.TwoVsTwoMode = testCase.twoVsTwoMode
+		recorder := web.getHttpResponse("/setup/schedule?matchType=qualification")
+		assert.Equal(t, 200, recorder.Code)
+		assert.Contains(t, recorder.Body.String(), testCase.expected)
+	}
 }
 
 func TestSetupScheduleErrors(t *testing.T) {
@@ -94,4 +146,44 @@ func TestSetupScheduleErrors(t *testing.T) {
 	recorder = web.postHttpResponse("/setup/schedule/save", postData)
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), "schedule of 2 Practice matches already exists")
+}
+
+func TestSetupScheduleModeChangeDiscardsPreview(t *testing.T) {
+	// A preview generated in one mode must not be saved after switching modes: 3v3 matches can't load in 2v2 mode,
+	// and 2v2 matches would leave the third stations empty in 3v3 mode.
+	for _, testCase := range []struct {
+		startInTwoVsTwo bool
+		numMatches      int
+	}{
+		{false, 19},
+		{true, 28},
+	} {
+		web := setupTestWeb(t)
+		web.arena.EventSettings.TwoVsTwoMode = testCase.startInTwoVsTwo
+		for i := 0; i < 14; i++ {
+			web.arena.Database.CreateTeam(&model.Team{Id: i + 1})
+		}
+		postData := fmt.Sprintf(
+			"numScheduleBlocks=1&startTime0=2014-01-01 09:00:00 AM&numMatches0=%d&matchSpacingSec0=480&"+
+				"matchType=qualification",
+			testCase.numMatches,
+		)
+		recorder := web.postHttpResponse("/setup/schedule/generate", postData)
+		assert.Equal(t, 303, recorder.Code)
+
+		settings := "name=Mode Change"
+		if !testCase.startInTwoVsTwo {
+			settings += "&twoVsTwoMode=on"
+		}
+		recorder = web.postHttpResponse("/setup/settings", settings)
+		assert.Equal(t, 303, recorder.Code)
+		assert.Equal(t, !testCase.startInTwoVsTwo, web.arena.EventSettings.TwoVsTwoMode)
+
+		recorder = web.postHttpResponse("/setup/schedule/save?matchType=qualification", "")
+		assert.Equal(t, 200, recorder.Code)
+		assert.Contains(t, recorder.Body.String(), "There is no schedule to save. Generate the schedule first.")
+		matches, err := web.arena.Database.GetMatchesByType(model.Qualification, true)
+		assert.Nil(t, err)
+		assert.Empty(t, matches)
+	}
 }
