@@ -67,9 +67,9 @@ The bench test is in [ArduinoPlc.md](ArduinoPlc.md). Run it after any sync that 
 
 ## The game
 
-The tree always carries exactly one game: the current year's, described by `specs/game_spec.yaml`. Earlier games
-live in git history. `apply-game` reads the previous version of the spec to learn what is being replaced. The
-game arrives as three pull requests: the spec, the rules (`specs/RULES.md`, in the manual's words) and the code.
+The tree carries exactly one game: the current year's, described by `specs/game_spec.yaml`. The only exception
+is the short no-game stage during a regeneration (below). Earlier games live in git history. `apply-game` works
+out from the code which game it is replacing. The game arrives as three pull requests: the spec, the rules (`specs/RULES.md`, in the manual's words) and the code.
 
 **What counts as game code (the seam):** the score model and its math, ranking order and tiebreaks, the rules
 list and foul values, match timing and sounds; every screen or report that lets someone enter a score, or that
@@ -81,7 +81,8 @@ is a base change and gets its own pull request.
 tests and run a match: a score is only fouls and the playoff disqualification flag; ranking is by ranking points
 (win 3, tie 1), then match points; a tied playoff match goes to the alliance with fewer major fouls; timing is
 auto, pause, teleop and a warning; the scoring panel shows only Commit; displays show teams, score and timer;
-the rules list keeps only the general rules ([`specs/GENERAL_RULES.md`](../specs/GENERAL_RULES.md)) and foul values stay upstream's, until a game replaces them; there is no `specs/game_spec.yaml` or `specs/RULES.md`.
+the rules list keeps only the general rules ([`specs/GENERAL_RULES.md`](../specs/GENERAL_RULES.md)) and foul values stay upstream's, until a game replaces them. `specs/game_spec.yaml` and `specs/RULES.md` stay as they are: they describe the game
+to apply next, not the no-game code.
 
 ## What survives a regeneration untouched
 

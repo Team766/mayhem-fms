@@ -4,7 +4,9 @@ Replace the game in the tree with the game described by `specs/game_spec.yaml`.
 
 For a coding agent (any LLM) or a careful person. It is phase 2 of two; phase 1 is
 [sync-upstream.md](sync-upstream.md). The spec format is in [game-spec-format.md](game-spec-format.md). The game
-being replaced is whatever `specs/game_spec.yaml` held before (`git show <base>:specs/game_spec.yaml`), if any.
+being replaced is the one the base's code implements, if any; a no-game base has none. Read its spec from the last
+commit that implemented it, not from the base: by the time the game pull request starts, the spec pull request has
+already replaced `specs/game_spec.yaml`.
 
 ## The idea
 
@@ -31,7 +33,7 @@ The spec is the durable artifact; when the tree moves to a new upstream, the sam
 ## Procedure
 
 1. **Read the whole spec and settle open questions first.** They are cheap now and expensive after forty files. The game being replaced shows how a game plugs into every screen.
-2. **Name what goes and what comes.** Outgoing: the ids and labels in the previous spec and the Go, JSON and CSS names derived from them. Incoming: the names you will use, from the new spec's ids. Put both in the pull request.
+2. **Name what goes and what comes.** Outgoing: the ids and labels in the outgoing game's spec (see the top of this page) and the Go, JSON and CSS names derived from them. Incoming: the names you will use, from the new spec's ids. Put both in the pull request.
 3. **Model and math, with table-driven tests in the same commit:** every scoring element in every phase; every ranking point at its threshold and one below; every tiebreak level with each side winning; every rule that mentions robots, in each alliance size; a table of whole matches with hand-worked totals. List the tests that encode a ruling on an open question, so a person can check those numbers.
 4. **Entry, then display and reporting.** Each spec construct becomes code the same way every year:
 
