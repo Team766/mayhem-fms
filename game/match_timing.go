@@ -12,8 +12,9 @@ var MatchTiming = struct {
 	PauseDurationSec            int
 	TeleopDurationSec           int
 	WarningRemainingDurationSec int
+	TossRemainingDurationSec    int // Seconds left when the toss opens, announced by the "toss" sound.
 	TimeoutDurationSec          int
-}{20, 3, 140, 30, 0}
+}{15, 3, 120, 30, 20, 0}
 
 func GetTeleopDurationSec() int {
 	return MatchTiming.TeleopDurationSec

@@ -6,11 +6,23 @@
 package game
 
 type ScoreSummary struct {
+	LeavePoints           int
+	AutoBalancePoints     int
+	AutoTreasurePoints    int
+	AutonPoints           int
+	TeleopTreasurePoints  int
+	EndgamePoints         int
+	TossPoints            int
+	TreasureCount         int
+	ShelfTreasureCount    int
+	ShelfTreasureGoal     int
 	MatchPoints           int
-	PostMatchPoints       int
 	FoulPoints            int
 	Score                 int
 	PlayoffDq             bool
+	AutonRankingPoint     bool
+	ScoringRankingPoint   bool
+	EndgameRankingPoint   bool
 	BonusRankingPoints    int
 	NumOpponentMajorFouls int
 }
@@ -47,11 +59,18 @@ func DetermineMatchStatus(
 	}
 
 	if applyPlayoffTiebreakers {
-		// Check scoring breakdowns to resolve playoff ties.
+		// Check scoring breakdowns to resolve playoff ties. The alliance that committed fewer major fouls wins, which
+		// is the alliance with the higher count of major fouls committed by its opponent.
 		if status := comparePoints(
 			redScoreSummary.NumOpponentMajorFouls, blueScoreSummary.NumOpponentMajorFouls,
 		); status != TieMatch {
 			return status, "TIEBREAK: MAJOR FOULS"
+		}
+		if status := comparePoints(redScoreSummary.AutonPoints, blueScoreSummary.AutonPoints); status != TieMatch {
+			return status, "TIEBREAK: AUTON POINTS"
+		}
+		if status := comparePoints(redScoreSummary.MatchPoints, blueScoreSummary.MatchPoints); status != TieMatch {
+			return status, "TIEBREAK: MATCH POINTS"
 		}
 		return TieMatch, "TRUE TIE"
 	}
