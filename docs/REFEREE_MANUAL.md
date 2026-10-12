@@ -1,7 +1,7 @@
 # Medieval Mayhem Referee Manual
 
 For the head referee and the other referees, who enter fouls and cards on a tablet. The foul list is the game
-manual's section 4.5, word for word ([specs/RULES.md](../specs/RULES.md)). Print the one-page
+manual's section 4.5, word for word. Print the one-page
 [foul card](FOUL_CARD.md) to keep at hand: every foul code with a short gist, minor and major, and the ones that give
 the other alliance a ranking point.
 

@@ -1,7 +1,7 @@
 # Medieval Mayhem Foul Card
 
 A one-page summary for referees. The gists are short reminders, not the rules: the full text is in the game manual,
-section 4.5, and in [specs/RULES.md](../specs/RULES.md). A foul's points go to the **other** alliance.
+section 4.5. A foul's points go to the **other** alliance.
 
 ## Fouls that also give the other alliance a ranking point
 

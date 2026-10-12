@@ -167,7 +167,7 @@ each one from **Setup > Field Testing**.
 ### Where the game lives
 
 The scoring rules are in [specs/game_spec.yaml](../specs/game_spec.yaml) and the foul list in
-[specs/RULES.md](../specs/RULES.md). To change the game, follow [agents/apply-game.md](agents/apply-game.md).
+[game/rule.go](../game/rule.go). To change the game, follow [agents/apply-game.md](agents/apply-game.md).
 
 ## 3. Preparing for Medieval Mayhem
 
