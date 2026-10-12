@@ -47,7 +47,7 @@ One pull request per step, so each can be reviewed against the one before:
 1. **Import**: the chosen upstream tree plus the files `DEVELOPMENT.md` says survive a regeneration, and nothing else. It is verified, not read: `git diff --stat <upstream ref> HEAD` must list only those files.
 2. **Remove**: one commit per row of "What we remove", ending at the no-game state. Almost all deletions. Leave `specs/` as it is: it describes the game `apply-game` puts back.
 3. **Add**: one pull request per row of "What we add". Carry last year's implementation forward where it still fits; re-implement against the new upstream code where it does not. Bring its tests.
-4. Record the checkpoint. If upstream moved to a new FRC season, re-check `specs/GENERAL_RULES.md` against that season's rules, using the principles at its top. Then hand off to `apply-game` with `specs/game_spec.yaml`.
+4. Record the checkpoint. If upstream moved to a new FRC season, update `specs/GENERAL_RULES.md` and the no-game `game/rule.go` to that season's rules, as the file describes. Then hand off to `apply-game` with `specs/game_spec.yaml`.
 
 ## Gates
 

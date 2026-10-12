@@ -8,7 +8,7 @@ It holds only the game's scoring: game pieces, the elements scorers enter and wh
 screens show, the bonus ranking points and the tiebreakers. These live elsewhere:
 
 - **Match timing:** event settings, with the game's defaults in code.
-- **Foul values and the rules list:** the rules pull request (`specs/RULES.md`, in the manual's own words).
+- **Foul values and the rules list:** the rules pull request (`game/foul.go` and `game/rule.go`, in the manual's own words).
 - **Screen layouts:** they follow from the structure below (see apply-game's table).
 - **Worked examples:** `apply-game` writes them as tests.
 - **Open questions:** a questions file kept out of the pull requests until they are answered.

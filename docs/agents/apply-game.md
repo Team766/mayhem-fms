@@ -27,7 +27,7 @@ The spec is the durable artifact; when the tree moves to a new upstream, the sam
 ## Three pull requests, in this order
 
 1. **Spec:** `specs/game_spec.yaml`. The game's authors review it.
-2. **Rules:** `specs/RULES.md`, the foul list in the manual's own words (struck-out text dropped), one row per severity a referee can call; `game/rule.go` written from it, with a test that checks they match and that the fouls the spec's `opponent_fouls` name give a ranking point. Wording we would like changed goes in `specs/RULE_SUGGESTIONS.md`, never into the list. The authors review this too.
+2. **Rules:** `game/rule.go`, the foul list in the manual's own words (struck-out text dropped), one entry per severity a referee can call, and the foul point values in `game/foul.go`, with a test that the fouls the spec's `opponent_fouls` name give a ranking point. When re-applying the same game after a regeneration, take the list from the last commit that implemented it. Wording we would like changed goes in `specs/RULE_SUGGESTIONS.md`, never into the list. The authors review this too.
 3. **Game:** everything else in the seam.
 
 ## Procedure
