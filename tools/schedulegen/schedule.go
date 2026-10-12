@@ -128,13 +128,14 @@ func Validate(rows []Row, numTeams, matchesPerTeam int) error {
 
 // Quality numbers for a template. All pair counts include surrogate appearances, since those matches are played.
 type Metrics struct {
-	MaxPartner     int // Most times any two teams share an alliance.
-	MaxOpponent    int // Most times any two teams face each other.
-	MaxRedBlueDiff int // Largest |red - blue| over teams, counted matches only.
-	MaxStationDiff int // Largest |first station - second station| over teams, counted matches only.
-	MinBetween     int // Fewest matches between any team's consecutive appearances.
-	BackToBack     int // Number of consecutive appearances with no match in between.
-	OneBetween     int // Number of consecutive appearances with exactly one match in between.
+	MaxPartner        int // Most times any two teams share an alliance.
+	MaxOpponent       int // Most times any two teams face each other.
+	MaxRedBlueDiff    int // Largest |red - blue| over teams, counted matches only.
+	MaxStationDiff    int // Largest |first station - second station| over teams, counted matches only.
+	MinBetween        int // Fewest matches between any team's consecutive appearances.
+	BackToBack        int // Number of consecutive appearances with no match in between.
+	MaxTeamBackToBack int // Most back-to-backs for any one team.
+	OneBetween        int // Number of consecutive appearances with exactly one match in between.
 }
 
 func Measure(rows []Row, numTeams int) Metrics {
@@ -144,6 +145,7 @@ func Measure(rows []Row, numTeams int) Metrics {
 	redBlue := make([]int, n)
 	station := make([]int, n)
 	last := make([]int, n) // Index of each team's previous appearance, or -1.
+	backToBacks := make([]int, n)
 	for i := range last {
 		last[i] = -1
 	}
@@ -175,6 +177,8 @@ func Measure(rows []Row, numTeams int) Metrics {
 				}
 				if between == 0 {
 					metrics.BackToBack++
+					backToBacks[team]++
+					metrics.MaxTeamBackToBack = max(metrics.MaxTeamBackToBack, backToBacks[team])
 				} else if between == 1 {
 					metrics.OneBetween++
 				}
@@ -200,6 +204,12 @@ func abs(x int) int {
 		return -x
 	}
 	return x
+}
+
+// Returns the fewest back-to-backs a template can have. Two consecutive matches hold eight appearances, so with
+// fewer than eight teams at least 8-numTeams teams play in both.
+func BackToBackBound(numTeams, numMatches int) int {
+	return max(0, (numMatches-1)*(2*slotsPerMatch-numTeams))
 }
 
 // Returns the lowest possible values of MaxPartner and MaxOpponent, if the pairings were spread perfectly. Each

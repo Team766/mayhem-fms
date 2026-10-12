@@ -40,7 +40,7 @@ and read by the generators:
 
 Like upstream's 3v3 schedules, the 2v2 templates are pre-generated and checked in, and the FMS only shuffles which real team takes which slot. `tools/schedulegen` makes them by simulated annealing: every team plays once per round, and the search keeps partners and opponents varied, red/blue balanced and a team's matches apart. When teams times matches isn't a multiple of four, a few surrogate appearances (at most one per team) fill out the schedule. They come early, between the second and third rounds, as in upstream's 3v3 templates, so the last matches, which often settle ranking cut-offs, are all counted. The output is deterministic. Regenerate all templates with `go run ./tools/schedulegen` (under a minute), or one with `-teams 14 -matches 8`; `-report` prints quality numbers instead of writing files.
 
-Small events can't meet every goal, so the generator asks for less: two matches between a team's own at 14 teams, one from 9 teams, none below that, and some pairs must meet again. The tests guarantee at least one match between a team's own at 14 teams; a few 14-team templates have one-match gaps.
+Small events can't meet every goal, so the generator asks for less: two matches between a team's own at 14 teams, one from 9 teams, none below that, and some pairs must meet again. Below 8 teams some back-to-back matches can't be avoided, since two matches in a row hold eight appearances; the templates have no more than that and spread them evenly over the teams. At 8 teams there are a few, at most two for any team, because avoiding them all would mean more repeat opponents. The tests guarantee at least one match between a team's own at 14 teams; a few 14-team templates have one-match gaps.
 
 ## Out of scope for now
 

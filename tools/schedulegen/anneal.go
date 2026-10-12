@@ -32,6 +32,13 @@ const (
 	// of matches.
 	weightTailRedBlue = 1_000
 
+	// Per team, times b(b-1) for its b back-to-backs, so the back-to-backs small events can't avoid are spread over
+	// the teams instead of a few teams taking most of them. Below 8 teams some are forced (see BackToBackBound) and
+	// this keeps every team near its share. At 8 teams none are forced, but avoiding them all costs repeat
+	// opponents, so the lighter weight only stops a team from taking several.
+	weightTeamBackToBack      = 1_000
+	weightTeamBackToBack8Team = 200
+
 	// Annealing: the temperature falls geometrically over movesPerSlot moves for each slot in the schedule. Then
 	// a zero-temperature polish keeps only improvements.
 	startTemperature   = 300.0
@@ -59,8 +66,9 @@ type annealer struct {
 	numMatches     int
 	numSurrogates  int
 	wantedGap      int
-	tailStart      int // The first stream slot of the surrogate tail, which ends at tailStart+numSurrogates.
-	tailSegment    int // The tail's index in times.
+	backToBack     int64 // The per-team back-to-back weight for this shape: weightTeamBackToBack or 0.
+	tailStart      int   // The first stream slot of the surrogate tail, which ends at tailStart+numSurrogates.
+	tailSegment    int   // The tail's index in times.
 	rng            *rand.Rand
 
 	// The stream of teams (0-based), and for each match which stream slot goes in which alliance slot.
@@ -112,6 +120,7 @@ func newAnnealer(numTeams, matchesPerTeam int, seed int64) *annealer {
 		numMatches:     numMatches,
 		numSurrogates:  numSurrogates,
 		wantedGap:      wantedGap(numTeams),
+		backToBack:     teamBackToBackWeight(numTeams),
 		tailStart:      tailSegment * numTeams,
 		tailSegment:    tailSegment,
 		rng:            rand.New(rand.NewSource(seed)),
@@ -329,18 +338,22 @@ func (a *annealer) bumpBalance(balance []int, team, change int, weight int64) {
 
 // The cost of how close together a team's consecutive appearances are.
 func (a *annealer) gapCost(team int) int64 {
-	var cost int64
+	var cost, backToBacks int64
 	previous := -1
 	for _, slot := range a.times[team] {
 		if slot < 0 {
 			continue
 		}
 		if previous >= 0 {
-			cost += a.gapPenalty(slot/slotsPerMatch - previous/slotsPerMatch - 1)
+			between := slot/slotsPerMatch - previous/slotsPerMatch - 1
+			cost += a.gapPenalty(between)
+			if between == 0 {
+				backToBacks++
+			}
 		}
 		previous = slot
 	}
-	return cost
+	return cost + a.backToBack*backToBacks*(backToBacks-1)
 }
 
 // The penalty for a team's next appearance coming this many matches after its previous one.
@@ -367,6 +380,17 @@ func wantedGap(numTeams int) int {
 		return 1
 	}
 	return 2
+}
+
+// The per-team back-to-back weight. From 9 teams wantedGap already keeps a gap, so it is 0 there.
+func teamBackToBackWeight(numTeams int) int64 {
+	switch {
+	case numTeams < 8:
+		return weightTeamBackToBack
+	case numTeams == 8:
+		return weightTeamBackToBack8Team
+	}
+	return 0
 }
 
 // Computes the cost from scratch; used once at the start, after which moves update it incrementally.
