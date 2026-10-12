@@ -248,7 +248,7 @@ func TestSetupSettingsSingleGameUntilFinals(t *testing.T) {
 	// explicitly resubmitted.
 	recorder = web.getHttpResponse("/setup/settings")
 	assert.Equal(t, 200, recorder.Code)
-	assert.Contains(t, recorder.Body.String(), "SingleGameUntilFinalsPlayoff")
+	assert.Regexp(t, `value="SingleGameUntilFinalsPlayoff"[^>]*checked`, recorder.Body.String())
 
 	recorder = web.postHttpResponse("/setup/settings", "name=Renamed Event")
 	assert.Equal(t, 303, recorder.Code)

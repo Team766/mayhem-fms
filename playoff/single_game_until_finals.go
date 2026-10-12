@@ -25,6 +25,8 @@ func newSingleGameUntilFinalsBracket(numAlliances int) (*Matchup, []breakSpec, e
 			matchup.NumWinsToAdvance = 1
 			for _, match := range matchup.matchSpecs[1:] {
 				match.isHidden = true
+				// Hidden games take no schedule time, so later rounds aren't listed hours late.
+				match.durationSec = 0
 			}
 			return nil
 		},

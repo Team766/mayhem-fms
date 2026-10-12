@@ -5,8 +5,10 @@ package playoff
 import (
 	"github.com/Team254/cheesy-arena/game"
 	"github.com/Team254/cheesy-arena/model"
+	"github.com/Team254/cheesy-arena/tournament"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestSingleGameUntilFinalsInitialWith4Alliances(t *testing.T) {
@@ -240,4 +242,26 @@ func TestSingleGameUntilFinalsFinalStillBestOfThree(t *testing.T) {
 	assert.True(t, finalMatchup.IsComplete())
 	assert.Equal(t, 1, finalMatchup.WinningAllianceId())
 	assert.Equal(t, 2, finalMatchup.LosingAllianceId())
+}
+
+func TestSingleGameUntilFinalsScheduledTimes(t *testing.T) {
+	database := setupTestDb(t)
+	tournament.CreateTestAlliances(database, 8)
+	playoffTournament, err := NewPlayoffTournament(model.SingleGameUntilFinalsPlayoff, 8)
+	assert.Nil(t, err)
+	assert.Nil(t, playoffTournament.CreateMatchesAndBreaks(database, time.Unix(0, 0)))
+
+	// Hidden tiebreak games take no time, so each visible game follows the one before it, and the final comes after
+	// the semifinals and the field break.
+	matches, err := database.GetMatchesByType(model.Playoff, true)
+	assert.Nil(t, err)
+	times := make(map[string]int64)
+	for _, match := range matches {
+		times[match.ShortName] = match.Time.Unix()
+	}
+	for shortName, minutes := range map[string]int64{
+		"QF1-1": 0, "QF2-1": 10, "QF3-1": 20, "QF4-1": 30, "SF1-1": 40, "SF2-1": 50, "F1": 68,
+	} {
+		assert.Equal(t, minutes*60, times[shortName], shortName)
+	}
 }
