@@ -22,7 +22,7 @@ type Appearance struct {
 type Row [slotsPerMatch]Appearance
 
 // Returns the number of matches needed to give each of numTeams teams matchesPerTeam appearances, and the number
-// of surrogate appearances that fill out the last match.
+// of surrogate appearances that make up the rest of the matches.
 func shape(numTeams, matchesPerTeam int) (numMatches, numSurrogates int) {
 	appearances := numTeams * matchesPerTeam
 	numMatches = (appearances + slotsPerMatch - 1) / slotsPerMatch

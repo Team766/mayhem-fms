@@ -1,10 +1,13 @@
 // Builds a 2v2 template by simulated annealing.
 //
-// The schedule is a stream of slots, four per match. The first numTeams*matchesPerTeam slots are split into
-// matchesPerTeam rounds of numTeams slots, and each round holds every team exactly once. If the appearances don't
-// fill the last match, the leftover slots form a short tail of surrogate appearances (distinct teams, so at most
-// one each). Because the rounds are fixed, every team plays once per round and so is spread evenly across the
-// schedule. The search only ever moves teams around inside a round, so it can never break that rule.
+// The schedule is a stream of slots, four per match. The counted appearances are split into matchesPerTeam rounds
+// of numTeams slots, and each round holds every team exactly once. If the appearances don't fill a whole number of
+// matches, the leftover slots form a short tail of surrogate appearances (distinct teams, so at most one each). The
+// tail sits after round 2, early in the schedule as in upstream's 3v3 templates, so the last matches, which often
+// settle ranking cut-offs, are all counted. Because the rounds are fixed, every team plays once per round and so is
+// spread evenly across the schedule. The search only ever moves teams around inside a round (or swaps which teams
+// are in the tail), so it can never break that rule. The tail shares matches with the rounds next to it; the gap
+// cost keeps a team out of a match it already plays in.
 
 package main
 
@@ -24,6 +27,11 @@ const (
 	weightRedBlue   = 300   // Per (red - blue)^2 for a team.
 	weightStation   = 20    // Per (first station - second station)^2 for a team.
 
+	// Per (red - blue)^2 over the surrogate appearances. The counted red/blue differences of all teams add up to
+	// minus the surrogates' one, so an uneven split forces some team off balance when teams play an even number
+	// of matches.
+	weightTailRedBlue = 1_000
+
 	// Annealing: the temperature falls geometrically over movesPerSlot moves for each slot in the schedule. Then
 	// a zero-temperature polish keeps only improvements.
 	startTemperature   = 300.0
@@ -34,6 +42,9 @@ const (
 	// Runs restart from a new random start until one is good enough (see goodEnough) or this many have been tried;
 	// the best is kept. Easy shapes stop after one or two, so the budget goes to the hard ones.
 	maxRestarts = 30
+
+	// The surrogate tail comes after this many rounds.
+	roundsBeforeTail = 2
 )
 
 // The chance of each kind of move, in percent.
@@ -48,19 +59,22 @@ type annealer struct {
 	numMatches     int
 	numSurrogates  int
 	wantedGap      int
+	tailStart      int // The first stream slot of the surrogate tail, which ends at tailStart+numSurrogates.
+	tailSegment    int // The tail's index in times.
 	rng            *rand.Rand
 
 	// The stream of teams (0-based), and for each match which stream slot goes in which alliance slot.
 	stream []int
 	order  [][slotsPerMatch]int
 
-	partners  []int   // Times each pair of teams (smaller*n+larger) shares an alliance.
-	opponents []int   // Times each pair of teams faces each other.
-	redBlue   []int   // Per team: counted red appearances minus blue.
-	station   []int   // Per team: counted first-station appearances minus second-station.
-	times     [][]int // Per team: stream slot of its appearance in each round, plus the tail (-1 if absent).
-	inTail    []bool
-	cost      int64
+	partners    []int   // Times each pair of teams (smaller*n+larger) shares an alliance.
+	opponents   []int   // Times each pair of teams faces each other.
+	redBlue     []int   // Per team: counted red appearances minus blue.
+	station     []int   // Per team: counted first-station appearances minus second-station.
+	tailRedBlue []int   // One entry: red surrogate appearances minus blue.
+	times       [][]int // Per team: stream slot of its appearance in each segment (round or tail), -1 if absent.
+	inTail      []bool
+	cost        int64
 }
 
 // Generates the best template found for the given shape, deterministically for a given seed.
@@ -91,12 +105,15 @@ func goodEnough(rows []Row, numTeams, matchesPerTeam int) bool {
 
 func newAnnealer(numTeams, matchesPerTeam int, seed int64) *annealer {
 	numMatches, numSurrogates := shape(numTeams, matchesPerTeam)
+	tailSegment := min(roundsBeforeTail, matchesPerTeam)
 	a := &annealer{
 		numTeams:       numTeams,
 		matchesPerTeam: matchesPerTeam,
 		numMatches:     numMatches,
 		numSurrogates:  numSurrogates,
 		wantedGap:      wantedGap(numTeams),
+		tailStart:      tailSegment * numTeams,
+		tailSegment:    tailSegment,
 		rng:            rand.New(rand.NewSource(seed)),
 		stream:         make([]int, numMatches*slotsPerMatch),
 		order:          make([][slotsPerMatch]int, numMatches),
@@ -104,15 +121,16 @@ func newAnnealer(numTeams, matchesPerTeam int, seed int64) *annealer {
 		opponents:      make([]int, numTeams*numTeams),
 		redBlue:        make([]int, numTeams),
 		station:        make([]int, numTeams),
+		tailRedBlue:    make([]int, 1),
 		times:          make([][]int, numTeams),
 		inTail:         make([]bool, numTeams),
 	}
 	// Each round starts as a random permutation of the teams.
 	for round := 0; round < matchesPerTeam; round++ {
-		copy(a.stream[round*numTeams:], a.rng.Perm(numTeams))
+		copy(a.stream[a.countedSlot(round*numTeams):], a.rng.Perm(numTeams))
 	}
 	// The surrogate tail is a random set of distinct teams.
-	copy(a.stream[numTeams*matchesPerTeam:], a.rng.Perm(numTeams)[:numSurrogates])
+	copy(a.stream[a.tailStart:], a.rng.Perm(numTeams)[:numSurrogates])
 	for m := range a.order {
 		a.order[m] = [slotsPerMatch]int{0, 1, 2, 3}
 	}
@@ -123,22 +141,37 @@ func newAnnealer(numTeams, matchesPerTeam int, seed int64) *annealer {
 		}
 	}
 	for slot, team := range a.stream {
-		a.times[team][a.roundOf(slot)] = slot
+		a.times[team][a.segmentOf(slot)] = slot
 	}
-	for slot := numTeams * matchesPerTeam; slot < len(a.stream); slot++ {
+	for slot := a.tailStart; slot < a.tailStart+numSurrogates; slot++ {
 		a.inTail[a.stream[slot]] = true
 	}
 	a.cost = a.fullCost()
 	return a
 }
 
-// The round a stream slot belongs to; the surrogate tail counts as one extra round.
-func (a *annealer) roundOf(slot int) int {
-	return min(slot/a.numTeams, a.matchesPerTeam)
+// The stream slot of the given counted appearance (0 to numTeams*matchesPerTeam-1), skipping over the tail.
+func (a *annealer) countedSlot(appearance int) int {
+	if appearance < a.tailStart {
+		return appearance
+	}
+	return appearance + a.numSurrogates
+}
+
+// The segment a stream slot belongs to, in stream order: the rounds, with the surrogate tail as one extra segment
+// after round roundsBeforeTail.
+func (a *annealer) segmentOf(slot int) int {
+	switch {
+	case slot < a.tailStart:
+		return slot / a.numTeams
+	case slot < a.tailStart+a.numSurrogates:
+		return a.tailSegment
+	}
+	return (slot-a.numSurrogates)/a.numTeams + 1
 }
 
 func (a *annealer) isCounted(slot int) bool {
-	return slot < a.numTeams*a.matchesPerTeam
+	return slot < a.tailStart || slot >= a.tailStart+a.numSurrogates
 }
 
 // The team in each alliance slot of a match: red1, red2, blue1, blue2.
@@ -186,6 +219,7 @@ func (a *annealer) randomMove() func() {
 		first := a.rng.Intn(a.numTeams * a.matchesPerTeam)
 		round := first / a.numTeams
 		second := round*a.numTeams + a.rng.Intn(a.numTeams)
+		first, second = a.countedSlot(first), a.countedSlot(second)
 		a.swapStream(first, second)
 		return func() { a.swapStream(first, second) }
 	case roll < chanceRoundSwap+chanceSlotSwap || a.numSurrogates == 0:
@@ -195,7 +229,7 @@ func (a *annealer) randomMove() func() {
 		a.swapOrder(match, first, second)
 		return func() { a.swapOrder(match, first, second) }
 	default:
-		slot := a.numTeams*a.matchesPerTeam + a.rng.Intn(a.numSurrogates)
+		slot := a.tailStart + a.rng.Intn(a.numSurrogates)
 		replacement := a.rng.Intn(a.numTeams)
 		old := a.stream[slot]
 		if a.inTail[replacement] {
@@ -219,8 +253,8 @@ func (a *annealer) swapStream(first, second int) {
 		a.removeMatch(matchB)
 	}
 	a.stream[first], a.stream[second] = teamB, teamA
-	round := a.roundOf(first)
-	a.times[teamA][round], a.times[teamB][round] = second, first
+	segment := a.segmentOf(first)
+	a.times[teamA][segment], a.times[teamB][segment] = second, first
 	a.addMatch(matchA)
 	if matchB != matchA {
 		a.addMatch(matchB)
@@ -242,8 +276,8 @@ func (a *annealer) replaceSurrogate(slot, team int) {
 	a.cost -= a.gapCost(old) + a.gapCost(team)
 	a.removeMatch(match)
 	a.stream[slot] = team
-	a.times[old][a.matchesPerTeam] = -1
-	a.times[team][a.matchesPerTeam] = slot
+	a.times[old][a.tailSegment] = -1
+	a.times[team][a.tailSegment] = slot
 	a.inTail[old], a.inTail[team] = false, true
 	a.addMatch(match)
 	a.cost += a.gapCost(old) + a.gapCost(team)
@@ -264,6 +298,7 @@ func (a *annealer) updateMatch(match, direction int) {
 	}
 	for i, team := range lineup {
 		if !a.isCounted(match*slotsPerMatch + a.order[match][i]) {
+			a.bumpBalance(a.tailRedBlue, 0, direction*(1-2*(i/2)), weightTailRedBlue)
 			continue
 		}
 		a.bumpBalance(a.redBlue, team, direction*(1-2*(i/2)), weightRedBlue)

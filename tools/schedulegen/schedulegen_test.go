@@ -43,6 +43,19 @@ func TestTemplatesHardRules(t *testing.T) {
 			rows := readTemplate(t, numTeams, matchesPerTeam)
 			err := Validate(rows, numTeams, matchesPerTeam)
 			assert.Nil(t, err, "%d teams, %d matches per team", numTeams, matchesPerTeam)
+
+			// Surrogates come early, between rounds 2 and 3, so the last matches are all counted.
+			_, numSurrogates := shape(numTeams, matchesPerTeam)
+			lastSurrogateMatch := (3*numTeams + numSurrogates + slotsPerMatch - 1) / slotsPerMatch
+			for i, row := range rows {
+				for _, appearance := range row {
+					if appearance.Surrogate {
+						assert.LessOrEqual(
+							t, i+1, lastSurrogateMatch, "%d teams, %d matches per team", numTeams, matchesPerTeam,
+						)
+					}
+				}
+			}
 		}
 	}
 }
