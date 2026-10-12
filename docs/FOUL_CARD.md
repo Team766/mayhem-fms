@@ -32,6 +32,7 @@ Pick the rule on the referee page, or the ranking point isn't given.
 | MA2615 | Not obeying the referee area signs (also major) |
 | MA2616 | Controlling more than 2 game pieces (extras don't score) |
 | MA2617 | Throwing onto the shelf from outside your safe house (doesn't score) |
+| Unsafe toss | Throwing the toss treasure in an unsafe way |
 
 ## Major fouls: 10 points
 
