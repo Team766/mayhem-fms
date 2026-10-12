@@ -13,12 +13,12 @@ type Rule struct {
 	Description    string
 }
 
-// All fouls the referee may assess, from section 4.5 of the 2026 M-Ayhem manual in its own words (struck-out text
-// left out); wording we would like changed is in specs/RULE_SUGGESTIONS.md. Rules that the referee may assess at either
-// severity (G423, MA2615) appear twice, since the rule dropdown is filtered by the foul's type. Two fouls have no rule
-// number in the manual, so a short label stands in for it. Left out on purpose: the card-only violations (G101, G102,
-// G206, G209, G246, MA2605, MA2618, MA2619, MA2620, MA2621, MA2623, MA2624) and the no-score violation MA2622. Ids must
-// stay stable, because stored fouls refer to them.
+// All fouls the referee may assess, from section 4.5 of the 2026 M-Ayhem manual in its own words (struck-out text left
+// out); wording we would like changed is in specs/RULE_SUGGESTIONS.md. Rules that the referee may assess at either
+// severity (G423, MA2615) appear twice, since the rule dropdown is filtered by the foul's type. Three fouls have no
+// rule number in the manual, so a short label stands in for it. Left out on purpose: the card-only violations (G101,
+// G102, G206, G209, G246, MA2605, MA2618, MA2619, MA2620, MA2621, MA2623, MA2624) and the no-score violation MA2622.
+// Ids must stay stable, because stored fouls refer to them.
 // @formatter:off
 var rules = []*Rule{
 	{1, "G210", true, false, "Do not force another robot to commit a foul."},
@@ -53,6 +53,7 @@ var rules = []*Rule{
 	{30, "MA2617", false, false, "Throwing a treasure into/on the shelf not inside own Safe House[treasure does not count for scoring]"},
 	{31, "Damaging contact", true, false, "Initiating damaging contact [Ref discretion]"},
 	{32, "Reaching onto field", true, false, "Having a part of your body reaching on to the field [Ref Discretion]"},
+	{33, "Unsafe toss", false, false, "Throwing in an unsafe manner is a minor foul, with options on escalation."},
 }
 
 // @formatter:on

@@ -64,9 +64,9 @@ func TestRuleCounts(t *testing.T) {
 		}
 	}
 
-	assert.Equal(t, 32, len(rules))
+	assert.Equal(t, 33, len(rules))
 	assert.Equal(t, 17, numMajor)
-	assert.Equal(t, 15, numMinor)
+	assert.Equal(t, 16, numMinor)
 	assert.Equal(t, 3, numRankingPoint)
 }
 
