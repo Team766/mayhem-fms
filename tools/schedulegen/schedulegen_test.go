@@ -126,17 +126,24 @@ func TestValidateRejectsBrokenTemplates(t *testing.T) {
 	assert.Nil(t, Validate(rows, 6, 1))
 
 	repeated := []Row{rows[0], {{5, false}, {6, false}, {5, true}, {2, true}}}
-	assert.NotNil(t, Validate(repeated, 6, 1), "a team twice in a match")
+	assert.EqualError(t, Validate(repeated, 6, 1), "match 2: team 5 appears twice")
 
-	missing := []Row{rows[0], {{5, false}, {5, true}, {1, true}, {2, true}}}
-	assert.NotNil(t, Validate(missing, 6, 1), "a team never plays")
+	// Team 6 plays twice, in different matches, so that team 1 can be left out.
+	missing := []Row{
+		{{6, false}, {2, false}, {3, false}, {4, false}},
+		{{5, false}, {6, false}, {2, true}, {3, true}},
+	}
+	assert.EqualError(t, Validate(missing, 6, 1), "team 1 plays 0 counted matches, expected 1")
 
+	// 6 teams x 3 matches = 18 appearances: five matches with two surrogates, both given to team 1.
 	doubleSurrogate := []Row{
 		{{1, false}, {2, false}, {3, false}, {4, false}},
-		{{5, false}, {6, false}, {1, true}, {2, true}},
-		{{1, true}, {3, true}, {4, true}, {2, true}},
+		{{5, false}, {6, false}, {1, true}, {2, false}},
+		{{1, false}, {3, false}, {4, false}, {5, false}},
+		{{6, false}, {2, false}, {1, true}, {4, false}},
+		{{1, false}, {3, false}, {5, false}, {6, false}},
 	}
-	assert.NotNil(t, Validate(doubleSurrogate, 6, 1))
+	assert.EqualError(t, Validate(doubleSurrogate, 6, 3), "team 1 has 2 surrogate appearances")
 }
 
 func TestCsvRoundTrip(t *testing.T) {

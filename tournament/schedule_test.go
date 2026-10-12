@@ -212,6 +212,12 @@ func TestScheduleTwoVsTwoSurrogates(t *testing.T) {
 		assert.Equal(t, 0, match.Blue3)
 		assert.False(t, match.Red3IsSurrogate)
 		assert.False(t, match.Blue3IsSurrogate)
+
+		teamSet := make(map[int]bool)
+		for _, teamId := range []int{match.Red1, match.Red2, match.Blue1, match.Blue2} {
+			assert.False(t, teamSet[teamId], "team %d repeats in match %s", teamId, match.ShortName)
+			teamSet[teamId] = true
+		}
 		for _, appearance := range []struct {
 			teamId      int
 			isSurrogate bool

@@ -274,13 +274,14 @@ Before the event, program one radio with a 5-digit team number at the kiosk, to 
 
 ### Schedule
 
-**With 2v2 on, the FMS can schedule exactly 14 teams, at 8, 10 or 12 matches per team** (28, 35 or 42 matches).
-Those are the only 2v2 schedule templates it has.
+**With 2v2 on, the FMS can schedule 6 to 14 teams, at 4 to 10 matches per team.** Those are the 2v2 schedule
+templates it has. If teams times matches per team isn't a multiple of 4, a few teams play one extra match early on
+as a surrogate; it doesn't count for them.
 
 1. **Setup > Match Scheduling**, choose **Qualification**.
 2. Set a block's start time, end time and cycle time (6:00 means a match every 6 minutes). Add more blocks for lunch
-   or a second day. The page shows the match count and matches per team; adjust the end time until it lands on 8,
-   10 or 12 per team.
+   or a second day. The page shows the match count and matches per team; adjust the end time until it lands on 4
+   to 10 per team.
 3. Click **Generate Schedule/Save Blocks** to preview a random schedule. Click it again for a different one.
 4. Click **Save Schedule**. This locks the team list and 2v2 mode.
 
@@ -482,7 +483,7 @@ The scoring and referee pages are also in the **Panel** menu.
 | Problem | Likely cause |
 |---|---|
 | Start Match stays grey | Hover over it. Usually a station with no robot and no bypass, an e-stop, or a PLC address set with no PLC connected |
-| "No schedule template exists" | With 2v2 on, there must be exactly 14 teams and 8, 10 or 12 matches per team |
+| "No schedule template exists" | With 2v2 on, there must be 6 to 14 teams and 4 to 10 matches per team |
 | 2v2 Mode can't be changed | A qualification schedule exists. **Clear Qualification Data** first (makes a backup) |
 | Teams can't be added or deleted | A qualification schedule exists |
 | The score badges never turn green | Every scoring page open for an alliance must commit, including a spare one left open on another device. Close extra pages, or commit them |
