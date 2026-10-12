@@ -2,8 +2,8 @@
 //
 // Usage, from the repository root:
 //
-//	go run ./tools/schedulegen                       # the whole grid
-//	go run ./tools/schedulegen -teams 14 -matches 8  # one template
+//	go run ./tools/twovstwoschedulegen                       # the whole grid
+//	go run ./tools/twovstwoschedulegen -teams 14 -matches 8  # one template
 //
 // The output is deterministic, so rerunning it reproduces the checked-in files.
 
