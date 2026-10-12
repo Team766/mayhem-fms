@@ -114,7 +114,7 @@ func TestMatchReviewEditExistingResult(t *testing.T) {
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), ">QF4-3<")
 	assert.Regexp(t, `(?s)>\s*0\s*</td>`, recorder.Body.String())  // The red score
-	assert.Regexp(t, `(?s)>\s*85\s*</td>`, recorder.Body.String()) // The blue score
+	assert.Regexp(t, `(?s)>\s*60\s*</td>`, recorder.Body.String()) // The blue score
 	assert.NotContains(t, recorder.Body.String(), "match-review-rps")
 
 	// Check response for non-existent match.
@@ -150,7 +150,7 @@ func TestMatchReviewEditExistingResult(t *testing.T) {
 	recorder = web.getHttpResponse("/match_review")
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), ">QF4-3<")
-	assert.Regexp(t, `(?s)>\s*15\s*</td>`, recorder.Body.String()) // The red score
+	assert.Regexp(t, `(?s)>\s*10\s*</td>`, recorder.Body.String()) // The red score
 	assert.Regexp(t, `(?s)>\s*5\s*</td>`, recorder.Body.String())  // The blue score
 	assert.NotContains(t, recorder.Body.String(), "match-review-rps")
 }
@@ -192,7 +192,7 @@ func TestMatchReviewCreateNewResult(t *testing.T) {
 	recorder = web.getHttpResponse("/match_review")
 	assert.Equal(t, 200, recorder.Code)
 	assert.Contains(t, recorder.Body.String(), ">QF4-3<")
-	assert.Regexp(t, `(?s)>\s*15\s*</td>`, recorder.Body.String()) // The red score
+	assert.Regexp(t, `(?s)>\s*10\s*</td>`, recorder.Body.String()) // The red score
 	assert.Regexp(t, `(?s)>\s*5\s*</td>`, recorder.Body.String())  // The blue score
 	assert.NotContains(t, recorder.Body.String(), "match-review-rps")
 }
@@ -268,9 +268,9 @@ func TestMatchReviewSummary(t *testing.T) {
 
 	var response MatchReviewSummaryResponse
 	assert.Nil(t, json.Unmarshal(recorder.Body.Bytes(), &response))
-	assert.Equal(t, 15, response.RedSummary.Score)
+	assert.Equal(t, 10, response.RedSummary.Score)
 	assert.Equal(t, 0, response.RedSummary.MatchPoints)
-	assert.Equal(t, 15, response.RedSummary.FoulPoints)
+	assert.Equal(t, 10, response.RedSummary.FoulPoints)
 	assert.Equal(t, 0, response.BlueSummary.Score)
 
 	matchResult, err := web.arena.Database.GetMatchResultForMatch(match.Id)
@@ -310,7 +310,7 @@ func TestMatchReviewSummaryCurrentMatch(t *testing.T) {
 	var response MatchReviewSummaryResponse
 	assert.Nil(t, json.Unmarshal(recorder.Body.Bytes(), &response))
 	assert.Equal(t, 0, response.RedSummary.Score)
-	assert.Equal(t, 15, response.BlueSummary.Score)
+	assert.Equal(t, 10, response.BlueSummary.Score)
 
 	assert.Equal(t, 0, len(web.arena.RedRealtimeScore.CurrentScore.Fouls))
 	assert.Equal(t, 0, len(web.arena.BlueRealtimeScore.CurrentScore.Fouls))

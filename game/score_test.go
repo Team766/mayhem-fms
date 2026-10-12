@@ -24,8 +24,9 @@ func TestScoreSummary(t *testing.T) {
 	blueSummary := blueScore.Summarize(redScore)
 	assert.Equal(t, 0, blueSummary.MatchPoints)
 	assert.Equal(t, 0, blueSummary.PostMatchPoints)
-	assert.Equal(t, 85, blueSummary.FoulPoints)
-	assert.Equal(t, 85, blueSummary.Score)
+	// Five major fouls at 10 points and two minor fouls at 5.
+	assert.Equal(t, 60, blueSummary.FoulPoints)
+	assert.Equal(t, 60, blueSummary.Score)
 	assert.Equal(t, false, blueSummary.PlayoffDq)
 	assert.Equal(t, 0, blueSummary.BonusRankingPoints)
 	assert.Equal(t, 5, blueSummary.NumOpponentMajorFouls)
@@ -33,7 +34,7 @@ func TestScoreSummary(t *testing.T) {
 	// Test that unsetting the team and rule ID don't invalidate the foul.
 	redScore.Fouls[0].TeamId = 0
 	redScore.Fouls[0].RuleId = 0
-	assert.Equal(t, 85, blueScore.Summarize(redScore).FoulPoints)
+	assert.Equal(t, 60, blueScore.Summarize(redScore).FoulPoints)
 
 	// Test playoff disqualification.
 	redScore.PlayoffDq = true
@@ -42,7 +43,7 @@ func TestScoreSummary(t *testing.T) {
 	assert.Equal(t, true, redSummary.PlayoffDq)
 	// Red's disqualification should not affect blue's own summary.
 	blueSummary = blueScore.Summarize(redScore)
-	assert.Equal(t, 85, blueSummary.Score)
+	assert.Equal(t, 60, blueSummary.Score)
 	assert.Equal(t, false, blueSummary.PlayoffDq)
 	blueScore.PlayoffDq = true
 	blueSummary = blueScore.Summarize(redScore)
