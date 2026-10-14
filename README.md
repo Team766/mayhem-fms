@@ -12,6 +12,13 @@ changes onto each new Cheesy Arena release, and the other applies each year's ga
 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for how this all fits together, and [docs/agents](docs/agents) for the
 playbooks.
 
+## Manuals
+
+- [Operator manual](docs/OPERATOR_MANUAL.md): building, setting up and running the FMS for an event.
+- [Scorer manual](docs/SCORER_MANUAL.md) and [referee manual](docs/REFEREE_MANUAL.md): for the volunteers on the
+  tablets.
+- [Foul card](docs/FOUL_CARD.md): a one-page summary of the fouls for referees.
+
 ## License
 
 Teams may use M-Ayhem FMS freely for practice, scrimmages, and off-season events. See [LICENSE](LICENSE) for more
