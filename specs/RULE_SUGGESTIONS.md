@@ -1,0 +1,51 @@
+# Rule wording suggestions
+
+The FMS's foul list, `game/rule.go`, uses the manual's own words. These are wording changes we would like to discuss with the
+manual's authors. Nothing here changes the FMS until the manual changes.
+
+| Rule | The manual says | Suggested | Why |
+| --- | --- | --- | --- |
+| MA2601, MA2603, MA2604, MA2606 | 3.6 and 3.8: balance beams are part of that team's Safe Zone. A comment in the doc says the beam is no longer in the safe zone. | Is the balance beam (top, tilt, flaps, shelf-side apron) part of the safe zone? If not, update 3.6 and 3.8. | Decides whether driving onto the other beam in auto is MA2603, and whether treasures on the beam count for hoarding. |
+| MA2606 | ... or touching the balance beam before endgame. | Whose beam? If the other alliance's: "... or touching the other alliance's balance beam before endgame." | As written it makes auto balancing on your own beam (12 points) a foul. |
+| MA2603, MA2606 | MA2603 (major, gives the other alliance the Auton RP): going into another team's safe house or safe zone within auton. MA2606 (minor): entering another alliance's Human Player Loading zone, Safe House or Safe Zone, or touching the balance beam before endgame. | Say which one applies during auton, for example MA2603 in auton and MA2606 after it. | Both cover entering the other alliance's safe house or safe zone during auton, with different penalties. Referees need one answer. |
+| The Toss | 2.3.3: in the last 10 seconds. 4.1.4: after 10 seconds of the endgame beginning. | Does the Toss start 10 or 20 seconds before the end of the match? | The two sections disagree, and "throwing early" is a foul. |
+| The Toss | Throwing the treasure early is a foul. Throwing in an unsafe manner is a minor foul, with options on escalation. | Give each a rule number in 4.5. Is throwing early a minor or a major foul? | Referees and the FMS need a number and a severity. |
+| The Toss, MA2621 | If a thrown treasure contacts a robot, the opponents' shelf, or any treasures in play, this is a yellow card and the Head Referee has the option to add a foul | When the Head Referee adds a foul, is it minor or major, and under which rule number? | MA2621 is yellow card only, and this foul has no number or severity. |
+| 3.4, 3.5, 3.6 | Opposing robots may never enter or contact robots in the opposing alliance's ... Doing so will result in a penalty. | Is contacting an opponent robot inside its own zone, from outside, a foul? If so, which rule and severity? | MA2606 covers entering only, and MA2602 covers the beam in endgame only. |
+| G403 | Do not cross the midfield line into the opponents half during AUTO. | Is there a taped midfield line? Is crossing it to take a center treasure a foul? | 3.3 defines no midfield line, and auto allows taking treasures from the middle. |
+| Damaging contact, G423, G415 | Initiating disabling contact is listed under both red and yellow cards; initiating damaging contact is an unnumbered major foul; G423 can be minor, major or red. | Merge these into G423 (minor, major or red) and G415, and drop the unnumbered lines. If not, say when each applies. | Four overlapping entries for contact; referees need one answer. |
+| Reaching onto field, G101 | G101 A (yellow): Having a part of your body reach across the field. Unnumbered major: Having a part of your body reaching on to the field. | Is reaching onto the field a major foul, a yellow card, or either at the referee's choice? Give it one number. | The same act is listed twice with different penalties. |
+| MA2615 | Teams that gather in this area will be penalized (MA2615). | Is MA2615 a foul only when the team is in the current match? If not, how is it applied? | A foul gives points to the other alliance in the current match, but bystanders are often from other teams. |
+| MA2601 | Exception: The Apron facing the middle of the field is okay to touch during anytime before the endgame. | During endgame, is touching the other alliance's middle-facing apron an MA2601 violation? | MA2601 gives a major foul and an RP, so the edge matters. |
+| MA2604 | Major Foul is given at the beginning of infraction, given every 10 seconds 6 non-scoring treasures are in the safe house or safe zone. | A major foul is given when it starts, and again every 10 seconds while more than 6 non-scoring treasures remain. | Unclear sentence; also see game question 33 on capping repeats. |
+| MA2604 | More than 6 non-scoring treasures in your safe house or safe zone. | What is a non-scoring treasure: one in front of the scoring tape? Does the crown count? Is the count per alliance? | Referees need to count the same way. |
+| MA2617 | Throwing a treasure into/on the shelf not inside own Safe House[treasure does not count for scoring] | Placing or throwing a treasure onto the shelf while no part of the chassis touches your own safe house [treasure does not count for scoring] | A missing space. 4.3 says "touching", not "inside", and placing from outside should count too. |
+| MA2616 | Controlling more than 2 gamepieces at a non-momentarily time | Controlling more than 2 treasures for more than a moment | "Non-momentarily time" is unclear. |
+| MA2616 | 4.1.2: Robots may carry or push at most 2 treasures | Does pushing 3 or more treasures count as controlling them? | Robots driving into the center pile will often push several. |
+| 4.8.1 | A robot ... may not get treasures from its human player. | What is the foul for loading a robot during auto: MA2607, MA2613, or a new rule? | The rule has no penalty. |
+| MA2608 | Placing/Throwing a treasure that bounces not first on the same alliance's robot, or the Human Player Loading zone Floor. | A loaded treasure must first touch the alliance's own robot or the human player loading zone floor. | Hard to parse. Also 3.4 says "a robot". Use the same words in both. |
+| 4.5.1 | [FRC] rules ... will be enforced as described in the manual. | Add: "The severity listed here replaces the FRC one." Also confirm that the G numbers match the 2026 FRC manual. | Several G rules are major here and minor in FRC. FRC renumbers its rules every year. |
+| Red cards | Penalty - no points for current match | Say whether only the carded team loses its points and RP, or the whole alliance. | Qualification alliances share one score. |
+| Red cards | Intentionally sabotaging the match (red card for the team after the match) | Is the red card for this match (given after it ends) or for the team's next match? | Unclear. |
+| 2.1 | Points can be taken away via penalties | Penalties add points to the other alliance. | Fouls add to the opponent, as 4.5.4 and 4.5.5 say. |
+| 4.4 | One robot on alliance parked on balance beam | One robot on the alliance balanced on its balance beam | 4.1.3 requires balanced. Parked could be read as just touching. |
+| 4.4, playoffs | If the amount of ranking points are tied, the team with the higher average match score will be ahead. | Does the match score include foul points? How is a tied playoff match decided? | The manual says nothing about playoff ties. The FMS uses fewer major fouls, then auto points, then points without fouls. |
+| G423 | Listed only with the yellow cards, plus a note that it can be a minor foul, major foul or red card. | List it under both minor and major fouls too. | Referees look for fouls in the foul lists. |
+| MA2615 | Listed only with the yellow cards, plus a note that it can be a minor foul, major foul or red card. | List it under both minor and major fouls too. | Same as G423. |
+| Damaging contact, Reaching onto field | Two major fouls with no rule number. | Give each a number. | Referees and teams quote fouls by number. |
+| MA2610 | The robot is also ineligible to gain points within auton by scoring in the shelf | Treasures that robot places in auto do not count, even if they stay in place. | Matches the ruling on game question 11. |
+| G401 | DRIVE TEAM members must be behind the lines during AUTO and | DRIVE TEAM members must be behind the lines during AUTO. | The sentence is cut off. |
+| G403 | ... into the opponents half during AUTO. | ... into the opponent's half during AUTO. | Typo. |
+| G408 | Neither a Human or Human Player may damage a Scoring Element | Neither a human nor a human player may damage a treasure. | Grammar; "treasure" is this year's word for a scoring element. |
+| G429 | Drive team members must stay designated areas | Drive team members must stay in their designated areas. | A word is missing. |
+| G434 | Coaches many not touch Scoring Elements, unless for safety purposes | Coaches may not touch treasures, unless for safety purposes. | Typo. |
+| MA2601 | Contacting the opposing team's balance beam at during the endgame | Contacting the opposing team's balance beam during the endgame | Typo. |
+| MA2602 | ... while they're in their own Balance Beam ... | ... while they're on their own balance beam ... | Wording. |
+| MA2609 | Contacting scoring own shelf repeatedly or in an unsafe manner | Contacting your own shelf repeatedly or in an unsafe manner | A stray word. |
+| MA2613 | Adding treasures within endgame | Adding treasures to the field during endgame | Clearer. |
+| MA2614 | Placing/Shooting treasures within the opposing alliance zones | Placing or shooting treasures into the opposing alliance's human loading zone, safe house or safe zone | Clearer, and names the zones. |
+| MA2611, MA2620 | Descoring pieces from other teams; Contacting the opposing teams shelf | Descoring pieces from other teams' shelves; Contacting the opposing team's shelf | Missing apostrophes. |
+| 3.6 | Opposing robots may never enter or contact robots in the opposing alliance's safe houses. | ... in the opposing alliance's safe zone. | This paragraph is about the safe zone. |
+| G101, G209 | G101 is used for "humans stay off the field" (yellow) and, with G209, for the Freeman maneuver (red). | Use one number per rule. | The same number names two different violations. |
+| MA2624 | MA2624 Failure to be behind the barriers (yellow card). 4.7: Failure to do so will result in a warning. | Say whether the first offence is a warning or a yellow card. | The two sections disagree. |
+| 4.5 | M-Ayhem 2-26 Specific Violations; (ie G409 or MA2601) | M-Ayhem 2026 Specific Violations; (ie G403 or MA2601) | Typo. G409 isn't a rule in this manual. |
