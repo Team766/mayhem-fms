@@ -1,12 +1,13 @@
 # Medieval Mayhem Scorer Manual
 
-For the volunteers who score Medieval Mayhem matches on a tablet. Each alliance has two scorers:
+Thank you for volunteering to be a scorer!  It's a lot of fun!  Here are some instructions for how to use the FMS' scoring panels to score a match.
+
+Each alliance has two scorers:
 
 - **Near scorer:** the treasures, by level.
 - **Far scorer:** everything else: each robot's leave, auto balance and endgame, the crown, and the toss.
 
-The head referee posts the score once both scorers on both alliances have committed. Fouls are not your job: the
-referees enter them.
+The head referee posts the score once both scorers on both alliances have committed.
 
 ## Before the event
 
@@ -27,9 +28,8 @@ referees enter them.
 
    If the operator asks one person to score a whole alliance, choose **Red** or **Blue** instead: it shows both halves
    on one page.
-3. If you see a login page, the username is `admin`; the operator gives you the password. You only log in once.
-4. Use **Add to Home Screen** in the browser menu so the page opens full screen like an app.
-5. Check the title at the top, for example "Red Near - Qualification 3": it names your alliance, your side and the
+3. \[Optional\] **Add to Home Screen** in the browser menu so the page opens full screen like an app.
+4. Check the title at the top, for example "Red Near - Qualification 3": it names your alliance, your side and the
    match that is loaded.
 
 The buttons stay grey until the match starts.
@@ -41,22 +41,22 @@ The buttons stay grey until the match starts.
 - **Auto treasure:** tap **+** for each treasure scored during autonomous, under the level it is on: Floor, First
   Shelf or Top Shelf.
 - **Teleop treasure:** the same for the rest of the match, plus **Stacked**.
-- Tapped one too many? Tap **−**. A counter never goes below zero.
+- Tapped one too many? Tap **−**.
 - Do not count the crown. The far scorer enters it.
 
 ## Far scorer: robots, the crown and the toss
 
 ![Red far scoring panel](manual-images/scorer-far.png)
 
-Each robot has its own row, labelled with its team number. In 2v2 there are two rows.
+Each robot has its own row, labelled with its team number.
 
-- **Leave:** tap when the robot earns Leave in autonomous, as the game manual defines it.
-- **Auto Balance:** tap when the robot earns Auto Balance. This also turns on Leave, because the robot had to leave
-  its safe house to reach the beam. If that is wrong, tap Leave to turn it off.
+- **Leave:** tap when the robot earns Leave in autonomous.
+- **Auto Balance:** tap when the robot earns Auto Balance. This also turns on Leave.
+  (If for some reason that is not the case, tap Leave to turn it off).
 - **Crown:** tap where the crown ends up: under **Auto Crown** if it was placed during autonomous, otherwise under
   **Teleop Crown**. There is only one crown; tapping another spot moves it, and tapping the lit spot clears it.
 - **Endgame:** at the end of the match, choose **None**, **Park** or **Balance** for each robot.
-- **The Toss:** tap when your alliance's toss treasure goes in. Tap again to undo.
+- **The Toss:** tap when the alliance you're scoring tosses the treasure into the target.
 
 ## After the match
 
@@ -82,13 +82,3 @@ for the FMS operator to fix it; after it is posted, the operator can still corre
 | Auto Balance, per robot | 12 | |
 | Park / Balance, per robot | | 2 / 12 |
 | The Toss | | 2 |
-
-The audience screen shows each alliance's treasure count and its progress toward the Scoring ranking point: teleop
-treasures on the first shelf, top shelf or stacked, with the crown counting as one.
-
-## If something goes wrong
-
-- **The page says it is disconnected, or nothing changes when you tap:** reload the page. Your entries are kept on
-  the FMS, not the tablet.
-- **The title shows the wrong match:** tell the FMS operator; they load the matches.
-- **The buttons are grey during a match:** reload. If they stay grey, tell the FMS operator.
