@@ -50,6 +50,3 @@ A one-page summary for referees.  A foul's points go to the **other** alliance.
 | MA2615 | Not obeying the referee area signs (also minor) |
 | Damaging contact | Initiating damaging contact |
 | Reaching onto field | Any part of a person reaching onto the field |
-
-**Cards only, not fouls in the FMS:** G101, G102, G206, G209, G246, MA2605, MA2618, MA2619, MA2620, MA2621, MA2623 and
-MA2624. **No score:** MA2622.
