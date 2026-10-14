@@ -115,7 +115,7 @@ over with an empty event, stop the FMS (Ctrl+C), move `event.db` somewhere else,
 ### A test match without robots
 
 1. Open **Run > Match Play** and click **Load Test Match**.
-2. Click **B** in the Byp column for every station that has no robot. A station needs a robot connected or a bypass
+2. Click the **Byp** cell for each station with no robot. A station needs a robot connected or a bypass
    before the match can start.
 3. Click **Start Match**. The match runs its full length; open the scoring pages (Panel menu) in other tabs to try
    them.
@@ -223,20 +223,6 @@ Open **Setup > Settings**. Settings can't be saved during a match.
 shows the score, then the next match's intro, without anyone touching it.
 
 Click **Save All Settings** at the bottom of any tab.
-
-### Optional: an admin password
-
-Without a password, anyone who can reach the FMS can open every page. That is fine when the FMS Wi-Fi is private,
-because team laptops can't reach the pages. If you want a password as well:
-
-1. **Setup > Settings > Event > Authentication:** enter a password and save. The username is always `admin`.
-2. Set it before you set up the tablets, and log each tablet in during setup. A login lasts until the password
-   changes.
-
-It protects the Setup, Match Play, Match Review editing, alliance selection, scoring and referee pages. The displays,
-reports and match logs stay open, so display screens never need to log in.
-
-![Login page](manual-images/operator-login.png)
 
 ### Teams
 
@@ -429,7 +415,8 @@ To show a past result on the audience display, click **Show Result** next to the
 1. After the last qualification match, open **Run > Alliance Selection** and click **Start Alliance Selection**.
 2. Set the audience display to **Alliance Selection** (the radio buttons on the same page).
 3. Type each captain, then each pick, pressing **Enter** after each. In 2v2 each alliance is a captain and one pick.
-4. The **Timer** counts down on the audience display: 45 s for the first round, or set your own.
+4. Click **Start** to run the timer on the audience display (45 s, or set your own), and **Reset** before the next
+   pick.
 5. Click **Finalize Alliance Selection** and enter the time the playoffs start. The playoff schedule is made, and
    Match Play opens on the first playoff match.
 

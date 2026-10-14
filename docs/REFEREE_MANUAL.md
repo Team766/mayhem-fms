@@ -15,7 +15,7 @@
    | Head referee | `http://10.0.100.5:8080/panels/referee` |
    | Other referees | `http://10.0.100.5:8080/panels/referee?hr=false` |
 
-3. \[Optional\] **Add to Home Screen** in the browser menu so the page opens full screen like an app.
+3. \[Optional, head referee only\] **Add to Home Screen** in the browser menu so the page opens full screen like an app.
 
 ## Entering a foul
 

@@ -11,7 +11,7 @@ The head referee posts the score once both scorers on both alliances have commit
 
 ## Before the event
 
-1. Connect the tablet to the field Wi-Fi. The FMS operator gives you its name and password.
+1. Connect the tablet to the field Wi-Fi. The FMS operator will give you the SSID and WPA Key.
 2. Open the FMS in Chrome (or Safari on an iPad) at `http://10.0.100.5:8080`, then choose your page from the
    **Panel** menu, under **Scoring**:
 
