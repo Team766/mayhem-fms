@@ -1,14 +1,9 @@
 # Medieval Mayhem Referee Manual
 
-For the head referee and the other referees, who enter fouls and cards on a tablet. The foul list is the game
-manual's section 4.5, word for word. Print the one-page
-[foul card](FOUL_CARD.md) to keep at hand: every foul code with a short gist, minor and major, and the ones that give
-the other alliance a ranking point.
-
 ## Before the event
 
-1. Connect the tablet to the field Wi-Fi. The FMS operator gives you its name and password.
-2. Open the FMS in Chrome (or Safari on an iPad) at `http://10.0.100.5:8080`, then choose your page from the
+1. Connect the tablet to the field Wi-Fi. The FMS operator will give you the SSID and WPA Key.
+2. Open the FMS in Chrome at `http://10.0.100.5:8080`, then choose your page from the
    **Panel** menu: **Head Referee** or **Referee**.
 
    ![The Panel menu](manual-images/panel-menu.png)
@@ -20,19 +15,18 @@ the other alliance a ranking point.
    | Head referee | `http://10.0.100.5:8080/panels/referee` |
    | Other referees | `http://10.0.100.5:8080/panels/referee?hr=false` |
 
-3. If you see a login page, the username is `admin`; the operator gives you the password. You only log in once.
-4. Use **Add to Home Screen** in the browser menu so the page opens full screen like an app.
+3. \[Optional\] **Add to Home Screen** in the browser menu so the page opens full screen like an app.
 
-Every referee page shows the same fouls, live: a foul one referee adds appears on all the others.
-
-## Entering a foul (every referee)
+## Entering a foul
 
 ![Referee page with a foul being entered](manual-images/referee-fouls.png)
 
 1. Tap the button for the alliance that **committed** the foul: **Blue** or **Red** for a minor foul, **Blue Major**
    or **Red Major** for a major foul. The points go to the other alliance: 5 for a minor foul, 10 for a major one.
 2. Optionally tap the team that committed it.
-3. Choose the rule from the list. Rules marked **+ RP** also give the other alliance a ranking point, but only when
+3. Choose the rule from the list.
+  
+   Rules marked **+ RP** also give the other alliance a ranking point, but only when
    that rule is chosen:
 
    | Rule | Gives the other alliance |
@@ -43,13 +37,7 @@ Every referee page shows the same fouls, live: a foul one referee adds appears o
 4. Entered the wrong severity? Tap the **Minor Foul** / **Major Foul** label to switch it (this clears the rule).
    Entered it by mistake? Tap **Delete**.
 
-The page reminds you that team and rule are optional. They are, except for the three rules above: without the rule,
-no ranking point is given.
-
 ## Head referee
-
-The head referee's page also has the team buttons on the left, a live summary of what the scorers have entered,
-and three buttons at the bottom.
 
 ![Head referee page during a match](manual-images/referee-head.png)
 
