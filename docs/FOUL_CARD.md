@@ -1,13 +1,10 @@
 # Medieval Mayhem Foul Card
 
-A one-page summary for referees. The gists are short reminders, not the rules: the full text is in the game manual,
-section 4.5. A foul's points go to the **other** alliance.
+A one-page summary for referees.  A foul's points go to the **other** alliance.
 
 ## Fouls that also give the other alliance a ranking point
 
-Pick the rule on the referee page, or the ranking point isn't given.
-
-| Code | Major | Gist | Other alliance gets |
+| Code | Major | Short Version | Other alliance gets |
 |---|---|---|---|
 | **MA2601** | 10 | Touching the opponent's balance beam in endgame | Endgame RP |
 | **MA2602** | 10 | Touching an opponent robot on its balance beam in endgame | Endgame RP |
@@ -15,7 +12,7 @@ Pick the rule on the referee page, or the ranking point isn't given.
 
 ## Minor fouls: 5 points
 
-| Code | Gist |
+| Code | Short Version |
 |---|---|
 | G403 | Crossing the midfield line in auton |
 | G423 | Damaging or impairing an opponent robot (also major) |
@@ -36,7 +33,7 @@ Pick the rule on the referee page, or the ranking point isn't given.
 
 ## Major fouls: 10 points
 
-| Code | Gist |
+| Code | Short Version |
 |---|---|
 | G210 | Forcing another robot to commit a foul |
 | G401 | Drive team not behind the lines in auton |
