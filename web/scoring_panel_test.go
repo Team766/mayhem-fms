@@ -41,14 +41,15 @@ func TestScoringPanel(t *testing.T) {
 			assert.NotContains(t, body, "Auto treasure")
 		}
 		if parameters.ShowsFar() {
-			assert.Contains(t, body, "Teleop crown")
-			assert.Contains(t, body, "crown-auto_top")
-			assert.Contains(t, body, "crown-teleop_stacked")
+			assert.Contains(t, body, "<h2>Crown</h2>")
+			assert.Contains(t, body, "crown-floor")
+			assert.Contains(t, body, "crown-stacked")
+			assert.NotContains(t, body, "crown-auto")
 			assert.Contains(t, body, "The Toss")
 			assert.Contains(t, body, "Balance")
 		} else {
 			assert.NotContains(t, body, "The Toss")
-			assert.NotContains(t, body, "Teleop crown")
+			assert.NotContains(t, body, "<h2>Crown</h2>")
 		}
 	}
 }

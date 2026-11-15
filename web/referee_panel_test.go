@@ -24,8 +24,7 @@ func TestRefereePanel(t *testing.T) {
 	assert.Contains(t, recorder.Body.String(), "Auto Bal")
 	assert.Contains(t, recorder.Body.String(), "Crown")
 	assert.Contains(t, recorder.Body.String(), "Scoring RP")
-	assert.Contains(t, recorder.Body.String(), `crownPlacementLabels = ["-","Auto Floor","Auto First Shelf","Auto Top Shelf","Teleop Floor",`+
-		`"Teleop First Shelf","Teleop Top Shelf","Teleop Stacked"];`)
+	assert.Contains(t, recorder.Body.String(), `crownPlacementLabels = ["-","Floor","First Shelf","Top Shelf","Stacked"];`)
 	assert.NotContains(t, recorder.Body.String(), "Coral")
 	assert.NotContains(t, recorder.Body.String(), "Algae")
 }

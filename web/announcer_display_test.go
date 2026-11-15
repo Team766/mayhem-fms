@@ -81,7 +81,7 @@ func TestAnnouncerDisplayScorePostedGameFields(t *testing.T) {
 	web.arena.SavedMatch = &match
 	web.arena.SavedMatchResult = &model.MatchResult{
 		RedScore: &game.Score{
-			AutoFirst: 1, TeleopTop: 2, Crown: game.CrownTeleopTop, Toss: true,
+			AutoFirst: 1, TeleopTop: 2, Crown: game.CrownTop, Toss: true,
 			LeaveStatuses:       [3]bool{true, true},
 			AutoBalanceStatuses: [3]bool{true},
 			EndgameStatuses:     [3]game.EndgameStatus{game.EndgameBalance, game.EndgamePark},

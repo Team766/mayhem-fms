@@ -75,7 +75,7 @@ func TestScoreSummarize(t *testing.T) {
 			"every counter and the crown",
 			S{
 				AutoFloor: 1, AutoFirst: 2, AutoTop: 3, TeleopFloor: 4, TeleopFirst: 5, TeleopTop: 6, TeleopStacked: 7,
-				Crown: CrownTeleopTop, Toss: true,
+				Crown: CrownTop, Toss: true,
 			},
 			nil,
 			W{
@@ -87,7 +87,7 @@ func TestScoreSummarize(t *testing.T) {
 		// The crown is worth twice a treasure in the same place; see also TestScoreCrown.
 		{
 			// 3 x 10 + 20: the other treasures are not doubled.
-			"crown with treasures in the same place", S{TeleopTop: 3, Crown: CrownTeleopTop}, nil,
+			"crown with treasures in the same place", S{TeleopTop: 3, Crown: CrownTop}, nil,
 			W{
 				TeleopTreasurePoints: 50, TreasureCount: 4,
 				ShelfTreasureCount: 4,
@@ -97,7 +97,7 @@ func TestScoreSummarize(t *testing.T) {
 			// Nothing else is doubled: not the robot points, not the toss, not the foul points.
 			"crown with robots, toss and a foul",
 			S{
-				Crown: CrownTeleopTop, LeaveStatuses: [3]bool{true, true}, EndgameStatuses: [3]EndgameStatus{balance},
+				Crown: CrownTop, LeaveStatuses: [3]bool{true, true}, EndgameStatuses: [3]EndgameStatus{balance},
 				Toss: true,
 			},
 			minors(ma2616),
@@ -295,24 +295,20 @@ func TestScoreSummarize(t *testing.T) {
 	}
 }
 
-// The crown is one treasure and is worth twice an ordinary treasure in the same place. It adds to the points of the
-// period in which it was placed, and counts toward the Scoring RP only on a shelf or stacked in teleop. Each spot is
-// added to 11 first-shelf treasures (55 points), one below the Scoring RP threshold.
+// The crown is one treasure and is worth twice an ordinary teleop treasure in the same place. It is only scored in
+// teleop, so it never adds to auto points or the Auton RP, and it counts toward the Scoring RP only on a shelf or
+// stacked. Each spot is added to 11 first-shelf treasures (55 points), one below the Scoring RP threshold.
 func TestScoreCrown(t *testing.T) {
 	testCases := []struct {
 		crown   CrownPlacement
 		points  int
-		inAuto  bool
 		onShelf bool
 	}{
-		{CrownNone, 0, false, false},
-		{CrownAutoFloor, 8, true, false},
-		{CrownAutoFirst, 16, true, false},
-		{CrownAutoTop, 24, true, false},
-		{CrownTeleopFloor, 4, false, false},
-		{CrownTeleopFirst, 10, false, true},
-		{CrownTeleopTop, 20, false, true},
-		{CrownTeleopStacked, 16, false, true},
+		{CrownNone, 0, false},
+		{CrownFloor, 4, false},
+		{CrownFirst, 10, true},
+		{CrownTop, 20, true},
+		{CrownStacked, 16, true},
 	}
 
 	for _, testCase := range testCases {
@@ -321,21 +317,11 @@ func TestScoreCrown(t *testing.T) {
 				points := testCase.points
 				assert.Equal(t, points, testCase.crown.PointValue())
 				want := ScoreSummary{
-					TeleopTreasurePoints: 55, TreasureCount: 12,
+					TeleopTreasurePoints: 55 + points, TreasureCount: 12,
 					ShelfTreasureCount: 11, ShelfTreasureGoal: 12,
 				}
 				if testCase.crown == CrownNone {
 					want.TreasureCount = 11
-				}
-				if testCase.inAuto {
-					want.AutoTreasurePoints = points
-					want.AutonPoints = points
-					if points >= 20 {
-						want.AutonRankingPoint = true
-						want.BonusRankingPoints = 1
-					}
-				} else {
-					want.TeleopTreasurePoints += points
 				}
 				if testCase.onShelf {
 					want.ShelfTreasureCount = 12
@@ -392,7 +378,7 @@ func TestScoreEquals(t *testing.T) {
 		"TeleopFirst":            func(score *Score) { score.TeleopFirst++ },
 		"TeleopTop":              func(score *Score) { score.TeleopTop++ },
 		"TeleopStacked":          func(score *Score) { score.TeleopStacked++ },
-		"Crown":                  func(score *Score) { score.Crown = CrownAutoFloor },
+		"Crown":                  func(score *Score) { score.Crown = CrownFloor },
 		"LeaveStatuses[0]":       func(score *Score) { score.LeaveStatuses[0] = !score.LeaveStatuses[0] },
 		"LeaveStatuses[1]":       func(score *Score) { score.LeaveStatuses[1] = !score.LeaveStatuses[1] },
 		"LeaveStatuses[2]":       func(score *Score) { score.LeaveStatuses[2] = !score.LeaveStatuses[2] },
@@ -421,7 +407,7 @@ func TestScoreEquals(t *testing.T) {
 func TestScoreValidate(t *testing.T) {
 	// The highest legal values pass.
 	valid := TestScore1()
-	valid.Crown = CrownTeleopStacked
+	valid.Crown = CrownStacked
 	valid.EndgameStatuses = [3]EndgameStatus{EndgameNone, EndgamePark, EndgameBalance}
 	assert.Nil(t, valid.Validate())
 
@@ -438,7 +424,7 @@ func TestScoreValidate(t *testing.T) {
 		{"negative TeleopTop", Score{TeleopTop: -1}, "TeleopTop can't be negative"},
 		{"negative TeleopStacked", Score{TeleopStacked: -2}, "TeleopStacked can't be negative"},
 		{"crown below range", Score{Crown: -1}, "invalid crown placement -1"},
-		{"crown above range", Score{Crown: CrownTeleopStacked + 1}, "invalid crown placement 8"},
+		{"crown above range", Score{Crown: CrownStacked + 1}, "invalid crown placement 5"},
 		{"endgame below range", Score{EndgameStatuses: [3]EndgameStatus{-1, 0, 0}}, "invalid endgame status -1 for robot 1"},
 		{"endgame above range", Score{EndgameStatuses: [3]EndgameStatus{0, 0, EndgameBalance + 1}}, "robot 3"},
 	} {
@@ -461,19 +447,16 @@ func TestCrownSpots(t *testing.T) {
 		id        string
 		name      string
 	}{
-		{CrownAutoFloor, "auto_floor", "Auto Floor"},
-		{CrownAutoFirst, "auto_first", "Auto First Shelf"},
-		{CrownAutoTop, "auto_top", "Auto Top Shelf"},
-		{CrownTeleopFloor, "teleop_floor", "Teleop Floor"},
-		{CrownTeleopFirst, "teleop_first", "Teleop First Shelf"},
-		{CrownTeleopTop, "teleop_top", "Teleop Top Shelf"},
-		{CrownTeleopStacked, "teleop_stacked", "Teleop Stacked"},
+		{CrownFloor, "floor", "Floor"},
+		{CrownFirst, "first", "First Shelf"},
+		{CrownTop, "top", "Top Shelf"},
+		{CrownStacked, "stacked", "Stacked"},
 	} {
 		assert.Equal(t, testCase.placement, CrownSpots[i].Placement)
 		assert.Equal(t, testCase.id, CrownSpots[i].Id)
 		assert.Equal(t, testCase.name, testCase.placement.String())
 		assert.Equal(t, testCase.name, labels[testCase.placement])
 	}
-	assert.Equal(t, int(CrownTeleopStacked), len(CrownSpots))
+	assert.Equal(t, int(CrownStacked), len(CrownSpots))
 	assert.Equal(t, len(CrownSpots)+1, len(labels))
 }

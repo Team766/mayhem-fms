@@ -68,7 +68,7 @@ var workedExamples = func() []workedExample {
 
 	// Example C: ranking points earned through opponent violations, with fouls (2v2).
 	cRed := S{
-		LeaveStatuses: [3]bool{true, true}, Crown: CrownAutoFirst, TeleopFirst: 2, TeleopTop: 3,
+		LeaveStatuses: [3]bool{true, true}, AutoFirst: 2, TeleopFirst: 2, TeleopTop: 3,
 		EndgameStatuses: [3]EndgameStatus{park, park}, Toss: true,
 		Fouls: majors(ruleIdMa2603, ruleIdMa2601, ruleIdMa2602),
 	}
@@ -78,7 +78,7 @@ var workedExamples = func() []workedExample {
 	}
 	cRedWant := W{
 		LeavePoints: 8, AutoTreasurePoints: 16, AutonPoints: 24, TeleopTreasurePoints: 40, EndgamePoints: 4,
-		TossPoints: 2, TreasureCount: 6, ShelfTreasureCount: 5, MatchPoints: 70,
+		TossPoints: 2, TreasureCount: 7, ShelfTreasureCount: 5, MatchPoints: 70,
 		FoulPoints: 25, Score: 95, AutonRankingPoint: true, BonusRankingPoints: 1, NumOpponentMajorFouls: 2,
 	}
 	// Blue earns both of its ranking points through red's violations; red earns its own on points.
@@ -106,7 +106,7 @@ var workedExamples = func() []workedExample {
 			},
 			blue: S{
 				LeaveStatuses: [3]bool{true}, AutoFloor: 1, TeleopFloor: 2, TeleopFirst: 2, TeleopTop: 1,
-				Crown: CrownTeleopFirst, EndgameStatuses: [3]EndgameStatus{park},
+				Crown: CrownFirst, EndgameStatuses: [3]EndgameStatus{park},
 			},
 			redWant: W{
 				LeavePoints: 8, AutoTreasurePoints: 8, AutonPoints: 16, TeleopTreasurePoints: 54, EndgamePoints: 14,
@@ -128,7 +128,7 @@ var workedExamples = func() []workedExample {
 			},
 			blue: S{
 				LeaveStatuses: [3]bool{true, true}, AutoFirst: 1, TeleopFloor: 1, TeleopFirst: 5, TeleopTop: 3,
-				TeleopStacked: 2, Crown: CrownTeleopTop, EndgameStatuses: [3]EndgameStatus{balance, balance},
+				TeleopStacked: 2, Crown: CrownTop, EndgameStatuses: [3]EndgameStatus{balance, balance},
 				Toss: true,
 			},
 			redWant: W{
