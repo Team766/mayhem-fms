@@ -26,8 +26,36 @@ func TestRefereePanel(t *testing.T) {
 	assert.Contains(t, recorder.Body.String(), "Scoring RP")
 	assert.Contains(t, recorder.Body.String(), `crownPlacementLabels = ["-","Auto Floor","Auto First Shelf","Auto Top Shelf","Teleop Floor",`+
 		`"Teleop First Shelf","Teleop Top Shelf","Teleop Stacked"];`)
+	assert.Contains(t, recorder.Body.String(), `id="rulePickerOverlay"`)
+	assert.Contains(t, recorder.Body.String(), `id="rulePickerCancelButton"`)
+	assert.Contains(t, recorder.Body.String(), `id="rulePickerModeToggle"`)
+	assert.Contains(t, recorder.Body.String(), `const foulRules = [`)
 	assert.NotContains(t, recorder.Body.String(), "Coral")
 	assert.NotContains(t, recorder.Body.String(), "Algae")
+}
+
+func TestRefereePanelFoulListRulePicker(t *testing.T) {
+	web := setupTestWeb(t)
+	web.arena.CurrentMatch.Red1, web.arena.CurrentMatch.Red2, web.arena.CurrentMatch.Red3 = 101, 102, 103
+	web.arena.CurrentMatch.Blue1, web.arena.CurrentMatch.Blue2, web.arena.CurrentMatch.Blue3 = 104, 105, 106
+	web.arena.RedRealtimeScore.CurrentScore.Fouls = []game.Foul{
+		{TeamId: 101, IsMajor: false, RuleId: 0},
+		{TeamId: 102, IsMajor: true, RuleId: 14}, // MA2601 (Major + RP)
+	}
+	web.arena.BlueRealtimeScore.CurrentScore.Fouls = []game.Foul{
+		{TeamId: 104, IsMajor: false, RuleId: 4}, // G403 (Minor)
+	}
+
+	recorder := web.getHttpResponse("/panels/referee/foul_list")
+	assert.Equal(t, 200, recorder.Code)
+	body := recorder.Body.String()
+	assert.Contains(t, body, `<select class="rule-select"`)
+	assert.Contains(t, body, `openRulePicker('red', 0, false, 0)`)
+	assert.Contains(t, body, "No Rule Selected")
+	assert.Contains(t, body, `openRulePicker('red', 1, true, 14)`)
+	assert.Contains(t, body, "MA2601 [+RP]:")
+	assert.Contains(t, body, `openRulePicker('blue', 0, false, 4)`)
+	assert.Contains(t, body, "G403:")
 }
 
 func TestRefereePanelTwoVsTwo(t *testing.T) {
