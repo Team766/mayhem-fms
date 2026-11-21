@@ -26,7 +26,7 @@ func TestScore1() *Score {
 		TeleopFirst:         4,
 		TeleopTop:           1,
 		TeleopStacked:       1,
-		Crown:               CrownTeleopTop,
+		Crown:               CrownTop,
 		LeaveStatuses:       [3]bool{true, true, false},
 		AutoBalanceStatuses: [3]bool{false, true, false},
 		EndgameStatuses:     [3]EndgameStatus{EndgameBalance, EndgamePark, EndgameNone},

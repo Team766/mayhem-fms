@@ -43,13 +43,9 @@ UI for entering realtime scores.
       </div>
       {{end}}
     </div>
-    <h2>Auto crown</h2>
+    <h2>Crown</h2>
     <div class="crown-group">
-      {{range .CrownSpots}}{{if eq .Phase "Auto"}}{{template "crownButton" .}}{{end}}{{end}}
-    </div>
-    <h2>Teleop crown</h2>
-    <div class="crown-group">
-      {{range .CrownSpots}}{{if eq .Phase "Teleop"}}{{template "crownButton" .}}{{end}}{{end}}
+      {{range .CrownSpots}}{{template "crownButton" .}}{{end}}
     </div>
     <h2>Endgame</h2>
     <div class="robot-group">

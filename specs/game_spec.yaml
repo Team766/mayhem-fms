@@ -75,8 +75,9 @@ statuses:
     scoring_group: treasure
     per: alliance
     scorer: far
-    phases:                     # one value across both phases
-      - { phase: auto, values: { floor: 8, first_shelf: 16, top_shelf: 24 } }
+    # Teleop only: the crown starts in the center pile, which robots can't reach in auto without crossing the midline
+    # (G403).
+    phases:
       - { phase: teleop, values: { floor: 4, first_shelf: 10, top_shelf: 20, stacked: 16 } }
 
   - id: endgame

@@ -178,7 +178,7 @@ func TestMatchReviewEditResultRoundTripsGameFields(t *testing.T) {
 	postBody := fmt.Sprintf(
 		"matchResultJson={\"MatchId\":%d,"+
 			"\"RedScore\":{\"AutoFloor\":1,\"AutoFirst\":2,\"AutoTop\":3,\"TeleopFloor\":4,\"TeleopFirst\":5,"+
-			"\"TeleopTop\":6,\"TeleopStacked\":7,\"Crown\":6,\"LeaveStatuses\":[true,false,true],"+
+			"\"TeleopTop\":6,\"TeleopStacked\":7,\"Crown\":3,\"LeaveStatuses\":[true,false,true],"+
 			"\"AutoBalanceStatuses\":[false,true,false],\"EndgameStatuses\":[0,1,2],\"Toss\":true,"+
 			"\"Fouls\":[{\"TeamId\":1,\"RuleId\":1}]},"+
 			"\"BlueScore\":{\"AutoFloor\":0,\"Crown\":0,\"Toss\":false,\"Fouls\":[]},"+
@@ -194,7 +194,7 @@ func TestMatchReviewEditResultRoundTripsGameFields(t *testing.T) {
 		t,
 		&game.Score{
 			AutoFloor: 1, AutoFirst: 2, AutoTop: 3, TeleopFloor: 4, TeleopFirst: 5, TeleopTop: 6, TeleopStacked: 7,
-			Crown:               game.CrownTeleopTop,
+			Crown:               game.CrownTop,
 			LeaveStatuses:       [3]bool{true, false, true},
 			AutoBalanceStatuses: [3]bool{false, true, false},
 			EndgameStatuses:     [3]game.EndgameStatus{game.EndgameNone, game.EndgamePark, game.EndgameBalance},
@@ -204,7 +204,7 @@ func TestMatchReviewEditResultRoundTripsGameFields(t *testing.T) {
 		savedResult.RedScore,
 	)
 
-	// The recomputed summary should reflect the new fields, including the crown (CrownTeleopTop = 20).
+	// The recomputed summary should reflect the new fields, including the crown (CrownTop = 20).
 	summary := savedResult.RedScoreSummary()
 	assert.Equal(t, 4+4, summary.LeavePoints) // Two robots left (stations 1 and 3).
 	assert.Equal(t, 4*1+8*2+12*3, summary.AutoTreasurePoints)

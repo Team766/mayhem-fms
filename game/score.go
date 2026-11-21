@@ -48,73 +48,55 @@ const (
 )
 
 // Represents where on the field the dragon's crown ended the match, if the alliance scored it. The treasure counters
-// never include the crown.
+// never include the crown. The crown starts in the center pile, which robots can't reach during autonomous without
+// crossing the midline (G403), so it can only be scored in teleop.
 type CrownPlacement int
 
 const (
 	CrownNone CrownPlacement = iota
-	CrownAutoFloor
-	CrownAutoFirst
-	CrownAutoTop
-	CrownTeleopFloor
-	CrownTeleopFirst
-	CrownTeleopTop
-	CrownTeleopStacked
+	CrownFloor
+	CrownFirst
+	CrownTop
+	CrownStacked
 )
 
-// Returns the crown's points, which are twice the value of an ordinary treasure in the same place.
+// Returns the crown's points, which are twice the value of an ordinary teleop treasure in the same place.
 func (placement CrownPlacement) PointValue() int {
 	switch placement {
-	case CrownAutoFloor:
-		return crownMultiplier * autoFloorPoints
-	case CrownAutoFirst:
-		return crownMultiplier * autoFirstShelfPoints
-	case CrownAutoTop:
-		return crownMultiplier * autoTopShelfPoints
-	case CrownTeleopFloor:
+	case CrownFloor:
 		return crownMultiplier * teleopFloorPoints
-	case CrownTeleopFirst:
+	case CrownFirst:
 		return crownMultiplier * teleopFirstShelfPoints
-	case CrownTeleopTop:
+	case CrownTop:
 		return crownMultiplier * teleopTopShelfPoints
-	case CrownTeleopStacked:
+	case CrownStacked:
 		return crownMultiplier * teleopStackedPoints
 	default:
 		return 0
 	}
 }
 
-// Returns true if the crown was placed during the autonomous period, meaning that its points belong to the auto
-// treasure points and count toward the Auton ranking point.
-func (placement CrownPlacement) IsAuto() bool {
-	return placement == CrownAutoFloor || placement == CrownAutoFirst || placement == CrownAutoTop
-}
-
 // CrownSpot is one place the crown can end up, as the screens show it.
 type CrownSpot struct {
 	Placement CrownPlacement
-	Id        string // The id the scoring panel sends, e.g. "teleop_top".
-	Phase     string // "Auto" or "Teleop".
+	Id        string // The id the scoring panel sends, e.g. "top".
 	Spot      string // "Floor", "First Shelf", "Top Shelf" or "Stacked".
 }
 
 // CrownSpots lists every place the crown can end up, in display order. The scoring panel, the edit-result form and
 // the referee panel read it instead of keeping their own copies.
 var CrownSpots = []CrownSpot{
-	{CrownAutoFloor, "auto_floor", "Auto", "Floor"},
-	{CrownAutoFirst, "auto_first", "Auto", "First Shelf"},
-	{CrownAutoTop, "auto_top", "Auto", "Top Shelf"},
-	{CrownTeleopFloor, "teleop_floor", "Teleop", "Floor"},
-	{CrownTeleopFirst, "teleop_first", "Teleop", "First Shelf"},
-	{CrownTeleopTop, "teleop_top", "Teleop", "Top Shelf"},
-	{CrownTeleopStacked, "teleop_stacked", "Teleop", "Stacked"},
+	{CrownFloor, "floor", "Floor"},
+	{CrownFirst, "first", "First Shelf"},
+	{CrownTop, "top", "Top Shelf"},
+	{CrownStacked, "stacked", "Stacked"},
 }
 
-// Returns the name of the placement, for display, e.g. "Teleop Top Shelf", or "None".
+// Returns the name of the placement, for display, e.g. "Top Shelf", or "None".
 func (placement CrownPlacement) String() string {
 	for _, spot := range CrownSpots {
 		if spot.Placement == placement {
-			return spot.Phase + " " + spot.Spot
+			return spot.Spot
 		}
 	}
 	return "None"
@@ -172,14 +154,8 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 			teleopTopShelfPoints*score.TeleopTop + teleopStackedPoints*score.TeleopStacked
 
 	// The dragon's crown is worth twice an ordinary treasure in the same place. The treasure counters never include it,
-	// so its points are added to the period in which it was placed.
-	crownPoints := score.Crown.PointValue()
-	if score.Crown.IsAuto() {
-		summary.AutoTreasurePoints += crownPoints
-	} else {
-		// CrownNone is worth zero, so adding it here is harmless.
-		summary.TeleopTreasurePoints += crownPoints
-	}
+	// and it can only be scored in teleop. CrownNone is worth zero.
+	summary.TeleopTreasurePoints += score.Crown.PointValue()
 
 	summary.AutonPoints = summary.LeavePoints + summary.AutoBalancePoints + summary.AutoTreasurePoints
 
@@ -211,7 +187,7 @@ func (score *Score) Summarize(opponentScore *Score) *ScoreSummary {
 	if score.Crown != CrownNone {
 		summary.TreasureCount++
 	}
-	if score.Crown == CrownTeleopFirst || score.Crown == CrownTeleopTop || score.Crown == CrownTeleopStacked {
+	if score.Crown == CrownFirst || score.Crown == CrownTop || score.Crown == CrownStacked {
 		summary.ShelfTreasureCount++
 	}
 	summary.ShelfTreasureGoal = ScoringRpThreshold
@@ -283,7 +259,7 @@ func (score *Score) Validate() error {
 			return fmt.Errorf("%s can't be negative (got %d)", name, value)
 		}
 	}
-	if score.Crown < CrownNone || score.Crown > CrownTeleopStacked {
+	if score.Crown < CrownNone || score.Crown > CrownStacked {
 		return fmt.Errorf("invalid crown placement %d", score.Crown)
 	}
 	for i, status := range score.EndgameStatuses {

@@ -53,8 +53,9 @@ Each robot has its own row, labelled with its team number.
 - **Leave:** tap when the robot earns Leave in autonomous.
 - **Auto Balance:** tap when the robot earns Auto Balance. This also turns on Leave.
   (If for some reason that is not the case, tap Leave to turn it off).
-- **Crown:** tap where the crown ends up: under **Auto Crown** if it was placed during autonomous, otherwise under
-  **Teleop Crown**. There is only one crown; tapping another spot moves it, and tapping the lit spot clears it.
+- **Crown:** tap where the crown ends up. The crown can only be scored in teleop: it starts in the center pile, which
+  robots can't reach in autonomous without crossing the midline (G403). There is only one crown; tapping another spot
+  moves it, and tapping the lit spot clears it.
 - **Endgame:** at the end of the match, choose **None**, **Park** or **Balance** for each robot.
 - **The Toss:** tap when the alliance you're scoring tosses the treasure into the target.
 
@@ -77,7 +78,7 @@ for the FMS operator to fix it; after it is posted, the operator can still corre
 | First Shelf treasure | 8 | 5 |
 | Top Shelf treasure | 12 | 10 |
 | Stacked treasure | | 8 |
-| Crown | twice the treasure value of its spot | twice the treasure value of its spot |
+| Crown | | twice the treasure value of its spot |
 | Leave, per robot | 4 | |
 | Auto Balance, per robot | 12 | |
 | Park / Balance, per robot | | 2 / 12 |
