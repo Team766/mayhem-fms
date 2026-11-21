@@ -27,6 +27,15 @@
     {{end}}
     {{end}}
   </div>
+  {{$selectedRule := index .rules .foul.RuleId}}
+  <button type="button" class="rule-select-button"
+    onclick="openRulePicker('{{.alliance}}', {{.index}}, {{.foul.IsMajor}}, {{.foul.RuleId}});">
+    {{if $selectedRule}}
+    <span class="rule-select-label">{{$selectedRule.RuleNumber}}{{if $selectedRule.IsRankingPoint}} [+RP]{{end}}: {{$selectedRule.Description}}</span>
+    {{else}}
+    <span class="rule-select-label rule-select-placeholder">No Rule Selected</span>
+    {{end}}
+  </button>
   <select class="rule-select" onchange="updateFoulRule('{{.alliance}}', {{.index}}, parseInt(this.value));">
     <option value="0" {{if eq $.foul.RuleId 0}} selected{{end}}>No Rule Selected</option>
     {{range $rule := .rules}}

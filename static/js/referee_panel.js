@@ -8,6 +8,36 @@ let redFoulsHashCode = 0;
 let blueFoulsHashCode = 0;
 let scoreIsReady = false;
 let isPostMatch = false;
+let activeRulePicker = null;
+const rulePickerModeStorageKey = "refereeRulePickerMode";
+
+// Switches the rule selector between the touch tile picker ("tiles") and the original dropdown ("dropdown").
+const setRulePickerMode = function (mode) {
+  const normalized = mode === "dropdown" ? "dropdown" : "tiles";
+  $("#refereePanel").attr("data-rule-picker", normalized);
+  $("#rulePickerModeToggle .mode-toggle-button").each(function () {
+    const isActive = $(this).attr("data-mode") === normalized;
+    $(this).toggleClass("active", isActive);
+    $(this).attr("aria-pressed", isActive ? "true" : "false");
+  });
+  if (normalized === "dropdown" && activeRulePicker !== null) {
+    closeRulePicker();
+  }
+  try {
+    window.localStorage.setItem(rulePickerModeStorageKey, normalized);
+  } catch (e) {
+    // Ignore storage errors in restricted browser contexts.
+  }
+};
+
+// Loads the saved rule selector mode from localStorage, defaulting to "tiles".
+const getSavedRulePickerMode = function () {
+  try {
+    return window.localStorage.getItem(rulePickerModeStorageKey) === "dropdown" ? "dropdown" : "tiles";
+  } catch (e) {
+    return "tiles";
+  }
+};
 
 // Sends the foul to the server to add it to the list.
 const addFoul = function (alliance, isMajor) {
@@ -28,6 +58,86 @@ const updateFoulTeam = function (alliance, index, teamId) {
 const updateFoulRule = function (alliance, index, ruleId) {
   websocket.send("updateFoulRule", {Alliance: alliance, Index: index, RuleId: ruleId});
 }
+
+// Opens the full-screen tile picker for choosing a foul rule.
+const openRulePicker = function (alliance, index, isMajor, currentRuleId) {
+  activeRulePicker = {alliance: alliance, index: index, isMajor: isMajor, currentRuleId: currentRuleId};
+
+  const overlay = document.getElementById("rulePickerOverlay");
+  const title = document.getElementById("rulePickerTitle");
+  const grid = document.getElementById("rulePickerGrid");
+  const clearButton = document.getElementById("rulePickerClearButton");
+
+  const allianceLabel = alliance === "red" ? "Red" : "Blue";
+  const severityLabel = isMajor ? "Major" : "Minor";
+  title.textContent = `${allianceLabel} ${severityLabel} Foul — Select Rule`;
+  overlay.setAttribute("data-alliance", alliance);
+
+  clearButton.classList.toggle("selected", currentRuleId === 0);
+  clearButton.setAttribute("aria-pressed", currentRuleId === 0 ? "true" : "false");
+
+  grid.innerHTML = "";
+  const matchingRules = foulRules.filter(rule => rule.IsMajor === isMajor);
+  for (const rule of matchingRules) {
+    const tile = document.createElement("button");
+    tile.type = "button";
+    tile.className = "rule-tile";
+    if (rule.Id === currentRuleId) {
+      tile.classList.add("selected");
+      tile.setAttribute("aria-pressed", "true");
+    } else {
+      tile.setAttribute("aria-pressed", "false");
+    }
+    tile.addEventListener("click", function () {
+      selectFoulRule(rule.Id);
+    });
+
+    const header = document.createElement("div");
+    header.className = "rule-tile-header";
+
+    const number = document.createElement("span");
+    number.className = "rule-tile-number";
+    number.textContent = rule.RuleNumber;
+    header.appendChild(number);
+
+    if (rule.IsRankingPoint) {
+      const badge = document.createElement("span");
+      badge.className = "rule-tile-badge";
+      badge.textContent = "+ RP";
+      header.appendChild(badge);
+    }
+
+    const description = document.createElement("div");
+    description.className = "rule-tile-description";
+    description.textContent = rule.Description;
+
+    tile.appendChild(header);
+    tile.appendChild(description);
+    grid.appendChild(tile);
+  }
+
+  overlay.hidden = false;
+  grid.scrollTop = 0;
+  document.body.classList.add("rule-picker-open");
+};
+
+// Applies the selected rule from the tile picker and closes the overlay.
+const selectFoulRule = function (ruleId) {
+  if (activeRulePicker !== null) {
+    updateFoulRule(activeRulePicker.alliance, activeRulePicker.index, ruleId);
+  }
+  closeRulePicker();
+};
+
+// Closes the rule tile picker without modifying the foul.
+const closeRulePicker = function () {
+  activeRulePicker = null;
+  const overlay = document.getElementById("rulePickerOverlay");
+  if (overlay) {
+    overlay.hidden = true;
+  }
+  document.body.classList.remove("rule-picker-open");
+};
 
 // Removes the foul with the given parameters from the list.
 var deleteFoul = function (alliance, index) {
@@ -243,6 +353,16 @@ $(function () {
   // Read the configuration for this display from the URL query string.
   var urlParams = new URLSearchParams(window.location.search);
   $(".headRef-dependent").attr("data-hr", urlParams.get("hr"));
+
+  // Restore the referee's preferred rule selector mode ("tiles" or "dropdown").
+  setRulePickerMode(getSavedRulePickerMode());
+
+  // Allow dismissing the rule picker with Escape.
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && activeRulePicker !== null) {
+      closeRulePicker();
+    }
+  });
 
   // Set up the websocket back to the server.
   websocket = new CheesyWebsocket("/panels/referee/websocket", {

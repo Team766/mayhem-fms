@@ -16,6 +16,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -31,8 +32,21 @@ func (web *Web) refereePanelHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// The templates are text/template, so the labels are encoded here for the page's script.
+	// The templates are text/template, so the labels and rules are encoded here for the page's script.
 	crownLabelsJson, err := json.Marshal(game.CrownLabels())
+	if err != nil {
+		handleWebErr(w, err)
+		return
+	}
+	allRules := game.GetAllRules()
+	sortedRules := make([]*game.Rule, 0, len(allRules))
+	for _, rule := range allRules {
+		sortedRules = append(sortedRules, rule)
+	}
+	sort.Slice(sortedRules, func(i, j int) bool {
+		return sortedRules[i].Id < sortedRules[j].Id
+	})
+	rulesJson, err := json.Marshal(sortedRules)
 	if err != nil {
 		handleWebErr(w, err)
 		return
@@ -40,7 +54,8 @@ func (web *Web) refereePanelHandler(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		*model.EventSettings
 		CrownLabelsJson string
-	}{web.arena.EventSettings, string(crownLabelsJson)}
+		RulesJson       string
+	}{web.arena.EventSettings, string(crownLabelsJson), string(rulesJson)}
 	err = template.ExecuteTemplate(w, "base_no_navbar", data)
 	if err != nil {
 		handleWebErr(w, err)

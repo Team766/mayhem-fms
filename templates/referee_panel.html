@@ -7,7 +7,7 @@ UI for entering and tracking fouls and red/yellow cards.
 {{define "title"}}Referee Panel{{end}}
 {{define "body"}}
 <div id="matchName"></div>
-<div id="refereePanel"{{if .TwoVsTwoMode}} class="two-v-two"{{end}}>
+<div id="refereePanel" data-rule-picker="tiles"{{if .TwoVsTwoMode}} class="two-v-two"{{end}}>
   {{$teamCount := 3}}{{if .TwoVsTwoMode}}{{$teamCount = 2}}{{end}}
   <div id="cards" class="headRef-dependent">
     <h3 id="teamTitle">Red/Yellow Cards</h3>
@@ -31,7 +31,13 @@ UI for entering and tracking fouls and red/yellow cards.
       {{template "scoreSummary" dict "id" "blueScoreSummary" "twoVsTwoMode" .TwoVsTwoMode}}
       {{template "scoreSummary" dict "id" "redScoreSummary" "twoVsTwoMode" .TwoVsTwoMode}}
     </div>
-    <h3>Fouls</h3>
+    <div id="foulsHeader">
+      <h3>Fouls</h3>
+      <div id="rulePickerModeToggle" class="rule-picker-mode-toggle" role="group" aria-label="Rule selector style">
+        <button type="button" class="mode-toggle-button" data-mode="tiles" onclick="setRulePickerMode('tiles');">Tiles</button>
+        <button type="button" class="mode-toggle-button" data-mode="dropdown" onclick="setRulePickerMode('dropdown');">Dropdown</button>
+      </div>
+    </div>
     <div id="foulButtons">
       <div class="foul-button blue-foul" onclick="addFoul('blue', false);">Blue</div>
       <div class="foul-button blue-foul" onclick="addFoul('blue', true);">Blue Major</div>
@@ -86,6 +92,20 @@ UI for entering and tracking fouls and red/yellow cards.
     </div>
   </div>
 </div>
+<div id="rulePickerOverlay" class="rule-picker-overlay" role="dialog" aria-modal="true" aria-labelledby="rulePickerTitle" hidden>
+  <div class="rule-picker-header">
+    <div id="rulePickerTitle" class="rule-picker-title">Select Rule</div>
+    <div class="rule-picker-actions">
+      <button type="button" id="rulePickerClearButton" class="rule-picker-action-button rule-picker-clear-button" onclick="selectFoulRule(0);">
+        No Rule
+      </button>
+      <button type="button" id="rulePickerCancelButton" class="rule-picker-action-button rule-picker-cancel-button" onclick="closeRulePicker();">
+        Cancel
+      </button>
+    </div>
+  </div>
+  <div id="rulePickerGrid" class="rule-picker-grid"></div>
+</div>
 {{end}}
 {{define "head"}}
 <link rel="manifest" href="/static/manifest/referee.manifest">
@@ -96,6 +116,8 @@ UI for entering and tracking fouls and red/yellow cards.
 <script>
   // The display name of each crown placement, indexed by its value, from the game package.
   const crownPlacementLabels = {{.CrownLabelsJson}};
+  // All rules that the referee may assign to a foul, ordered by ID.
+  const foulRules = {{.RulesJson}};
 </script>
 <script src="/static/js/match_timing.js"></script>
 <script src="/static/js/referee_panel.js"></script>
